@@ -1944,21 +1944,21 @@ Version 0.1完成時までにREADMEへ、
 
 # 82. Phase 0 — プロジェクト準備
 
-- [ ] Gitリポジトリ構成
-- [ ] React + TypeScript + Vite作成
-- [ ] NestJS + TypeScript作成
-- [ ] TypeORM導入
-- [ ] PostgreSQL開発環境
-- [ ] Docker Compose
-- [ ] `.env.example`
-- [ ] `.gitignore`
-- [ ] README
-- [ ] Formatter
-- [ ] Linter
-- [ ] Migration環境
-- [ ] Frontend起動
-- [ ] Backend起動
-- [ ] PostgreSQL接続
+- [x] Gitリポジトリ構成
+- [x] React + TypeScript + Vite作成
+- [x] NestJS + TypeScript作成
+- [x] TypeORM導入
+- [x] PostgreSQL開発環境
+- [x] Docker Compose
+- [x] `.env.example`
+- [x] `.gitignore`
+- [x] README
+- [x] Formatter
+- [x] Linter
+- [x] Migration環境
+- [x] Frontend起動
+- [x] Backend起動
+- [x] PostgreSQL接続
 
 ---
 
