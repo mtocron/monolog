@@ -1964,26 +1964,26 @@ Version 0.1完成時までにREADMEへ、
 
 # 83. Phase 1 — Backend共通基盤 / Settings
 
-- [ ] 環境変数読み込み
-- [ ] PostgreSQL接続
-- [ ] TypeORM設定
-- [ ] Migration環境
-- [ ] ULID生成共通処理
-- [ ] ULID Validation
-- [ ] DTO Validation
-- [ ] Error Handling
-- [ ] CORS
-- [ ] Logging
-- [ ] Health Check API
-- [ ] `app_settings` 作成
-- [ ] `app_settings_log` 作成
-- [ ] Settings Trigger Function
-- [ ] Settings INSERT Trigger
-- [ ] Settings UPDATE Trigger
-- [ ] Settings Service
-- [ ] Settings API
-- [ ] `image.root_path` 初期設定
-- [ ] `appearance.theme` 初期設定
+- [x] 環境変数読み込み
+- [x] PostgreSQL接続
+- [x] TypeORM設定
+- [x] Migration環境
+- [x] ULID生成共通処理
+- [x] ULID Validation
+- [x] DTO Validation
+- [x] Error Handling
+- [x] CORS
+- [x] Logging
+- [x] Health Check API
+- [x] `app_settings` 作成
+- [x] `app_settings_log` 作成
+- [x] Settings Trigger Function
+- [x] Settings INSERT Trigger
+- [x] Settings UPDATE Trigger
+- [x] Settings Service
+- [x] Settings API
+- [x] `image.root_path` 初期設定
+- [x] `appearance.theme` 初期設定
 
 ---
 

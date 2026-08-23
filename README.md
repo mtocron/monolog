@@ -52,10 +52,17 @@ npm run typecheck
 npm run test
 ```
 
-Migration は TypeORM CLI で管理します。Phase 0 時点では、まだアプリケーション用の Migration はありません。
+Migration は TypeORM CLI で管理します。初回起動後に、`app_settings` と設定変更履歴用の `app_settings_log` を作成します。
 
 ```bash
 cd backend
 npm run migration:run
 npm run migration:revert
 ```
+
+## Phase 1 API
+
+- `GET /api/health`
+- `GET /api/settings`
+- `GET /api/settings/:key`
+- `PUT /api/settings/:key`（`image.root_path` または `appearance.theme`）
