@@ -237,7 +237,14 @@ function App() {
           monolog
         </button>
         <div className="header-actions">
-          <button onClick={() => setPage("settings")}>Settings</button>
+          <button
+            className="settings-button"
+            aria-label="Settings"
+            title="Settings"
+            onClick={() => setPage("settings")}
+          >
+            ⚙
+          </button>
           <button className="primary" onClick={create}>
             記録する
           </button>
