@@ -2089,18 +2089,18 @@ Version 0.1完成時までにREADMEへ、
 
 # 88. Phase 6 — Theme / Settings UI
 
-- [ ] Settings画面
-- [ ] image.root_path表示
-- [ ] image.root_path変更
-- [ ] Theme選択
-- [ ] Lightテーマ
-- [ ] Darkテーマ
-- [ ] Captureテーマ
-- [ ] Capture Palette実装
-- [ ] CSS Semantic Token化
-- [ ] Theme即時反映
-- [ ] Theme DB保存
-- [ ] 再読み込み後Theme復元
+- [x] Settings画面
+- [x] image.root_path表示
+- [x] image.root_path変更
+- [x] Theme選択
+- [x] Lightテーマ
+- [x] Darkテーマ
+- [x] Captureテーマ
+- [x] Capture Palette実装
+- [x] CSS Semantic Token化
+- [x] Theme即時反映
+- [x] Theme DB保存
+- [x] 再読み込み後Theme復元
 - [ ] PC表示確認
 - [ ] Smartphone表示確認
 

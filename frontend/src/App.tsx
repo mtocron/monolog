@@ -5,6 +5,7 @@ import {
   type Emotion,
   type Entry,
   type EntryInput,
+  type Theme,
   type Tag,
   type Weather,
 } from "./api";
@@ -55,22 +56,39 @@ function App() {
   const [entry, setEntry] = useState<Entry | null>(null);
   const [editing, setEditing] = useState<Entry | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
-  const [page, setPage] = useState<"list" | "detail" | "form">("list");
+  const [page, setPage] = useState<"list" | "detail" | "form" | "settings">(
+    "list",
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [tagName, setTagName] = useState("");
+  const [theme, setTheme] = useState<Theme>("light");
+  const [imageRootPath, setImageRootPath] = useState("");
   const fail = (reason: unknown) =>
     setError(reason instanceof Error ? reason.message : "操作に失敗しました。");
   const reload = async () => {
     setLoading(true);
     try {
-      const [nextEntries, nextTags] = await Promise.all([
+      const [nextEntries, nextTags, settings] = await Promise.all([
         api.entries.list(),
         api.tags.list(),
+        api.settings.list(),
       ]);
       setEntries(nextEntries);
       setTags(nextTags);
+      const values = new Map(
+        settings.map((setting) => [setting.key, setting.value]),
+      );
+      const savedTheme = values.get("appearance.theme");
+      if (
+        savedTheme === "light" ||
+        savedTheme === "dark" ||
+        savedTheme === "capture"
+      ) {
+        setTheme(savedTheme);
+      }
+      setImageRootPath(values.get("image.root_path") ?? "");
     } catch (reason) {
       fail(reason);
     } finally {
@@ -80,6 +98,9 @@ function App() {
   useEffect(() => {
     void reload();
   }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
   const detail = async (id: string) => {
     setLoading(true);
     try {
@@ -96,6 +117,32 @@ function App() {
     setForm(emptyForm());
     setError("");
     setPage("form");
+  };
+  const changeTheme = async (nextTheme: Theme) => {
+    const previousTheme = theme;
+    setTheme(nextTheme);
+    setError("");
+    try {
+      await api.settings.update("appearance.theme", nextTheme);
+    } catch (reason) {
+      setTheme(previousTheme);
+      fail(reason);
+    }
+  };
+  const saveImageRootPath = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const setting = await api.settings.update(
+        "image.root_path",
+        imageRootPath.trim(),
+      );
+      setImageRootPath(setting.value ?? "");
+    } catch (reason) {
+      fail(reason);
+    } finally {
+      setSaving(false);
+    }
   };
   const edit = () => {
     if (!entry) return;
@@ -189,9 +236,12 @@ function App() {
         <button className="brand" onClick={() => setPage("list")}>
           monolog
         </button>
-        <button className="primary" onClick={create}>
-          記録する
-        </button>
+        <div className="header-actions">
+          <button onClick={() => setPage("settings")}>Settings</button>
+          <button className="primary" onClick={create}>
+            記録する
+          </button>
+        </div>
       </header>
       {error && (
         <div className="error" role="alert">
@@ -265,7 +315,101 @@ function App() {
           cancel={() => setPage(editing ? "detail" : "list")}
         />
       )}
+      {page === "settings" && (
+        <SettingsView
+          theme={theme}
+          imageRootPath={imageRootPath}
+          saving={saving}
+          setImageRootPath={setImageRootPath}
+          selectTheme={(nextTheme) => void changeTheme(nextTheme)}
+          saveImageRootPath={() => void saveImageRootPath()}
+        />
+      )}
     </main>
+  );
+}
+function SettingsView({
+  theme,
+  imageRootPath,
+  saving,
+  setImageRootPath,
+  selectTheme,
+  saveImageRootPath,
+}: {
+  theme: Theme;
+  imageRootPath: string;
+  saving: boolean;
+  setImageRootPath: (value: string) => void;
+  selectTheme: (theme: Theme) => void;
+  saveImageRootPath: () => void;
+}) {
+  const themes: { id: Theme; label: string }[] = [
+    { id: "light", label: "Light" },
+    { id: "dark", label: "Dark" },
+    { id: "capture", label: "Capture" },
+  ];
+  return (
+    <section>
+      <div className="heading">
+        <div>
+          <small>Settings</small>
+          <h1>設定</h1>
+        </div>
+      </div>
+      <div className="settings-panel">
+        <section className="settings-section" aria-labelledby="storage-heading">
+          <div>
+            <small>ストレージ</small>
+            <h2 id="storage-heading">画像保存先</h2>
+          </div>
+          <label>
+            image.root_path
+            <input
+              value={imageRootPath}
+              maxLength={1024}
+              onChange={(event) => setImageRootPath(event.target.value)}
+              placeholder="C:/monolog/images"
+            />
+          </label>
+          <div className="right">
+            <button
+              className="primary"
+              disabled={saving || !imageRootPath.trim()}
+              onClick={saveImageRootPath}
+            >
+              {saving ? "保存中…" : "保存する"}
+            </button>
+          </div>
+        </section>
+        <section
+          className="settings-section"
+          aria-labelledby="appearance-heading"
+        >
+          <div>
+            <small>外観</small>
+            <h2 id="appearance-heading">テーマ</h2>
+          </div>
+          <div className="theme-choices" role="radiogroup" aria-label="テーマ">
+            {themes.map(({ id, label }) => (
+              <label className="theme-choice" key={id} data-preview-theme={id}>
+                <input
+                  type="radio"
+                  name="theme"
+                  value={id}
+                  checked={theme === id}
+                  onChange={() => selectTheme(id)}
+                />
+                <span className="theme-preview" aria-hidden="true">
+                  <i />
+                  <b />
+                </span>
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+      </div>
+    </section>
   );
 }
 function Meta({ entry }: { entry: Entry }) {

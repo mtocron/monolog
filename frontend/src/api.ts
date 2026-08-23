@@ -32,6 +32,14 @@ export type EntryInput = {
   weather: Weather | null;
   location: string | null;
 };
+export type Theme = "light" | "dark" | "capture";
+export type SettingKey = "image.root_path" | "appearance.theme";
+export type AppSetting = {
+  id: string;
+  key: SettingKey;
+  value: string | null;
+  description: string | null;
+};
 type Failure = { message?: string | string[] };
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, {
@@ -89,5 +97,13 @@ export const api = {
     list: () => request<Tag[]>("/tags"),
     create: (name: string) =>
       request<Tag>("/tags", { method: "POST", body: JSON.stringify({ name }) }),
+  },
+  settings: {
+    list: () => request<AppSetting[]>("/settings"),
+    update: (key: SettingKey, value: string) =>
+      request<AppSetting>(`/settings/${key}`, {
+        method: "PUT",
+        body: JSON.stringify({ value }),
+      }),
   },
 };
