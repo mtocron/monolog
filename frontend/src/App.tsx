@@ -11,25 +11,42 @@ import {
 } from "./api";
 import "./App.css";
 
-const emotions: [Emotion, string][] = [
-  ["very_happy", "とても嬉しい"],
-  ["happy", "嬉しい"],
-  ["neutral", "ふつう"],
-  ["sad", "悲しい"],
-  ["very_sad", "とても悲しい"],
-  ["angry", "怒り"],
-  ["anxious", "不安"],
-  ["tired", "疲れた"],
-  ["excited", "わくわく"],
+type IconChoice<T extends string> = { id: T; label: string; icon: string };
+const emotions: IconChoice<Emotion>[] = [
+  { id: "happy", label: "嬉しい", icon: "☺" },
+  { id: "calm", label: "穏やか", icon: "☻" },
+  { id: "sad", label: "悲しい", icon: "☹" },
+  { id: "angry", label: "怒り", icon: "⚡" },
+  { id: "anxious", label: "不安", icon: "◔" },
+  { id: "tired", label: "疲れた", icon: "◡" },
+  { id: "excited", label: "わくわく", icon: "✦" },
 ];
-const weather: [Weather, string][] = [
-  ["sunny", "晴れ"],
-  ["cloudy", "くもり"],
-  ["rainy", "雨"],
-  ["snowy", "雪"],
+const weather: IconChoice<Weather>[] = [
+  { id: "sunny", label: "晴れ", icon: "☀" },
+  { id: "cloudy", label: "くもり", icon: "☁" },
+  { id: "rainy", label: "雨", icon: "☂" },
+  { id: "snowy", label: "雪", icon: "❄" },
+  { id: "sunny_cloudy", label: "晴れのちくもり", icon: "🌤" },
+  { id: "sunny_rainy", label: "晴れのち雨", icon: "🌦" },
+  { id: "cloudy_rainy", label: "くもりのち雨", icon: "🌧" },
 ];
-const label = (pairs: [string, string][], value: string | null) =>
-  pairs.find(([id]) => id === value)?.[1];
+const legacyEmotionLabels: Record<string, string> = {
+  very_happy: "嬉しい",
+  neutral: "穏やか",
+  very_sad: "悲しい",
+};
+const legacyEmotionIcons: Record<string, string> = {
+  very_happy: "☺",
+  neutral: "☻",
+  very_sad: "☹",
+};
+const label = (choices: IconChoice<string>[], value: string | null) =>
+  choices.find((choice) => choice.id === value)?.label ??
+  (value ? (legacyEmotionLabels[value] ?? value) : undefined);
+const icon = (choices: IconChoice<string>[], value: string) =>
+  choices.find((choice) => choice.id === value)?.icon ??
+  legacyEmotionIcons[value] ??
+  value;
 const dateTime = (date = new Date()) =>
   new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
@@ -422,8 +439,24 @@ function SettingsView({
 function Meta({ entry }: { entry: Entry }) {
   return (
     <div className="meta">
-      {entry.emotion && <span>{label(emotions, entry.emotion)}</span>}
-      {entry.weather && <span>{label(weather, entry.weather)}</span>}
+      {entry.emotion && (
+        <span
+          className="meta-icon"
+          aria-label={label(emotions, entry.emotion)}
+          title={label(emotions, entry.emotion)}
+        >
+          {icon(emotions, entry.emotion)}
+        </span>
+      )}
+      {entry.weather && (
+        <span
+          className="meta-icon"
+          aria-label={label(weather, entry.weather)}
+          title={label(weather, entry.weather)}
+        >
+          {icon(weather, entry.weather)}
+        </span>
+      )}
       {entry.location && <span>⌖ {entry.location}</span>}
     </div>
   );
@@ -443,8 +476,6 @@ function Card({ entry, onClick }: { entry: Entry; onClick: () => void }) {
       <button onClick={onClick}>
         <time>{format(entry.recordedAt)}</time>
         <p>{entry.content}</p>
-        <Meta entry={entry} />
-        <Tags entry={entry} />
         {entry.images.length > 0 && (
           <div className="thumbs">
             {entry.images.slice(0, 4).map((image) => (
@@ -456,6 +487,8 @@ function Card({ entry, onClick }: { entry: Entry; onClick: () => void }) {
             ))}
           </div>
         )}
+        <Meta entry={entry} />
+        <Tags entry={entry} />
       </button>
     </article>
   );
@@ -471,8 +504,6 @@ function EntryView({
     <article className="detail">
       <time>{format(entry.recordedAt)}</time>
       <p>{entry.content}</p>
-      <Meta entry={entry} />
-      <Tags entry={entry} />
       {entry.images.length > 0 && (
         <div className="images">
           {entry.images.map((image) => (
@@ -491,6 +522,8 @@ function EntryView({
           ))}
         </div>
       )}
+      <Meta entry={entry} />
+      <Tags entry={entry} />
     </article>
   );
 }
@@ -552,38 +585,6 @@ function FormView({
             />
           </label>
           <label>
-            感情
-            <select
-              value={form.emotion ?? ""}
-              onChange={(event) =>
-                set("emotion", (event.target.value || null) as Emotion | null)
-              }
-            >
-              <option value="">選択しない</option>
-              {emotions.map(([id, name]) => (
-                <option value={id} key={id}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            天気
-            <select
-              value={form.weather ?? ""}
-              onChange={(event) =>
-                set("weather", (event.target.value || null) as Weather | null)
-              }
-            >
-              <option value="">選択しない</option>
-              {weather.map(([id, name]) => (
-                <option value={id} key={id}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
             場所
             <input
               maxLength={255}
@@ -593,11 +594,53 @@ function FormView({
             />
           </label>
         </div>
-        <fieldset>
-          <legend>タグ</legend>
-          <div className="choices">
+        <div className="selection-row">
+          <fieldset className="icon-picker emotion-picker">
+            <legend>感情</legend>
+            <div className="icon-choices" role="radiogroup" aria-label="感情">
+              {emotions.map((choice) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  className={form.emotion === choice.id ? "selected" : ""}
+                  aria-pressed={form.emotion === choice.id}
+                  onClick={() =>
+                    set("emotion", form.emotion === choice.id ? null : choice.id)
+                  }
+                >
+                  <span aria-hidden="true">{choice.icon}</span>
+                  <span className="sr-only">{choice.label}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="icon-picker weather-picker">
+            <legend>天気</legend>
+            <div className="icon-choices" role="radiogroup" aria-label="天気">
+              {weather.map((choice) => (
+                <button
+                  key={choice.id}
+                  type="button"
+                  className={form.weather === choice.id ? "selected" : ""}
+                  aria-pressed={form.weather === choice.id}
+                  onClick={() =>
+                    set("weather", form.weather === choice.id ? null : choice.id)
+                  }
+                >
+                  <span aria-hidden="true">{choice.icon}</span>
+                  <span className="sr-only">{choice.label}</span>
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+        <fieldset className="tag-picker">
+          <legend>
+            <span aria-hidden="true">🏷</span> タグ
+          </legend>
+          <div className="tag-choices">
             {tags.map((tag) => (
-              <label key={tag.id}>
+              <label className="tag-choice" key={tag.id}>
                 <input
                   type="checkbox"
                   checked={form.tagIds.includes(tag.id)}
@@ -610,7 +653,7 @@ function FormView({
                     )
                   }
                 />
-                #{tag.name}
+                <span aria-hidden="true">🏷</span> #{tag.name}
               </label>
             ))}
           </div>

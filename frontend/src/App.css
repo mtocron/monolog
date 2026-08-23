@@ -1,5 +1,5 @@
 .app {
-  max-width: 880px;
+  width: min(100%, 960px);
   min-height: 100svh;
   margin: auto;
   padding: 0 24px 64px;
@@ -22,8 +22,9 @@ header {
   gap: 8px;
 }
 .settings-button {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-surface);
@@ -48,6 +49,7 @@ header {
   background: var(--color-primary);
   color: var(--color-primary-text);
   font-weight: 700;
+  min-height: 44px;
 }
 .heading {
   margin: 38px 0 22px;
@@ -63,7 +65,7 @@ h1 {
 }
 .list {
   display: grid;
-  gap: 14px;
+  gap: 0;
 }
 .card,
 .detail,
@@ -71,6 +73,15 @@ form {
   border: 1px solid var(--color-border);
   border-radius: 12px;
   background: var(--color-surface);
+}
+.card {
+  border: 0;
+  border-bottom: 1px solid var(--color-border);
+  border-radius: 0;
+  background: transparent;
+}
+.card:first-child {
+  border-top: 1px solid var(--color-border);
 }
 .settings-panel {
   display: grid;
@@ -105,6 +116,7 @@ form {
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
   padding: 10px;
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -166,16 +178,19 @@ form {
   background: none;
   text-align: left;
   color: inherit;
+  overflow-wrap: anywhere;
 }
 .card p,
 .detail > p {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   line-height: 1.75;
   color: var(--color-text-primary);
 }
 .meta,
 .tags,
-.choices {
+.tag-choices {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -183,12 +198,19 @@ form {
 }
 .meta span,
 .tags span,
-.choices label {
+.tag-choice {
   padding: 3px 8px;
   border-radius: 999px;
   background: var(--color-muted);
   color: var(--color-text-secondary);
   font-size: 0.82rem;
+}
+.meta .meta-icon {
+  min-width: 32px;
+  padding: 4px 8px;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1;
 }
 .thumbs {
   display: flex;
@@ -200,6 +222,10 @@ form {
   height: 64px;
   object-fit: cover;
   border-radius: 6px;
+}
+.thumbs {
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 .state {
   text-align: center;
@@ -222,6 +248,8 @@ form {
   border: 0;
   background: none;
   color: var(--color-primary);
+  min-width: 44px;
+  min-height: 44px;
   padding: 8px;
 }
 .danger {
@@ -274,6 +302,20 @@ select {
   background: var(--color-background);
   color: var(--color-text-primary);
 }
+input[type="file"] {
+  min-height: 44px;
+  padding: 7px;
+}
+input[type="file"]::file-selector-button {
+  min-height: 30px;
+  margin-right: 10px;
+  border: 0;
+  border-radius: 5px;
+  padding: 4px 8px;
+  background: var(--color-muted);
+  color: var(--color-text-primary);
+  font: inherit;
+}
 textarea {
   min-height: 180px;
   resize: vertical;
@@ -288,13 +330,72 @@ fieldset {
   margin: 0;
   padding: 0;
 }
-.choices label {
+.tag-choice {
   display: flex;
   align-items: center;
   gap: 4px;
+  min-height: 40px;
+  cursor: pointer;
 }
-.choices input {
-  width: auto;
+.tag-choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.tag-choice:has(input:checked) {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+.icon-picker {
+  gap: 10px;
+}
+.selection-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.icon-picker legend,
+.tag-picker legend {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.icon-choices {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.icon-choices button {
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+}
+.icon-choices button > span {
+  font-size: 1.55rem;
+  line-height: 1;
+}
+.icon-choices button.selected {
+  border-color: var(--color-primary);
+  background: var(--color-muted);
+  color: var(--color-heading);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+.emotion-picker .icon-choices button {
+  min-height: 40px;
+}
+.weather-picker .icon-choices button {
+  min-height: 40px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
 }
 .newtag {
   display: flex;
@@ -313,6 +414,18 @@ small {
   color: var(--color-text-secondary);
   font-weight: 400;
 }
+@media (min-width: 601px) and (max-width: 900px) {
+  .app {
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+  .theme-choices {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .images {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
 @media (max-width: 600px) {
   .app {
     padding: 0 16px 40px;
@@ -323,8 +436,30 @@ small {
   h1 {
     font-size: 1.65rem;
   }
+  header {
+    min-height: 68px;
+  }
+  .header-actions {
+    gap: 4px;
+  }
+  .header-actions .primary {
+    padding: 8px 12px;
+  }
+  .heading {
+    align-items: flex-end;
+    gap: 12px;
+  }
+  .heading .primary {
+    padding: 8px 12px;
+  }
+  .card > button {
+    padding: 16px;
+  }
   .grid {
     grid-template-columns: 1fr;
+  }
+  .selection-row {
+    gap: 10px;
   }
   .detail,
   form,
@@ -336,5 +471,19 @@ small {
   }
   .theme-choices {
     grid-template-columns: 1fr;
+  }
+  .newtag {
+    align-items: stretch;
+  }
+  .newtag input {
+    min-width: 0;
+  }
+  .actions {
+    align-items: stretch;
+  }
+  .actions > span {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }

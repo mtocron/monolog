@@ -9,15 +9,16 @@ import {
 } from 'class-validator';
 
 export const EMOTIONS = [
-  'very_happy',
   'happy',
-  'neutral',
+  'calm',
   'sad',
-  'very_sad',
   'angry',
   'anxious',
   'tired',
   'excited',
+  'very_happy',
+  'neutral',
+  'very_sad',
 ] as const;
 
 export const WEATHER_CONDITIONS = [
@@ -25,6 +26,9 @@ export const WEATHER_CONDITIONS = [
   'cloudy',
   'rainy',
   'snowy',
+  'sunny_cloudy',
+  'sunny_rainy',
+  'cloudy_rainy',
 ] as const;
 
 export class CreateEntryDto {

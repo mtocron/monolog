@@ -725,11 +725,9 @@ Entryに0〜1個の感情を設定できる。
 初期候補：
 
 ```text
-very_happy
 happy
-neutral
+calm
 sad
-very_sad
 angry
 anxious
 tired
@@ -751,6 +749,9 @@ sunny
 cloudy
 rainy
 snowy
+sunny_cloudy
+sunny_rainy
+cloudy_rainy
 ```
 
 Version 0.1では外部天気APIを使用しない。
@@ -2108,15 +2109,15 @@ Version 0.1完成時までにREADMEへ、
 
 # 89. Phase 7 — レスポンシブ対応
 
-- [ ] PC
-- [ ] Smartphone
-- [ ] Tablet
-- [ ] Entry入力
-- [ ] 画像選択
-- [ ] タップ操作
-- [ ] 長文
-- [ ] Settings
-- [ ] Theme
+- [x] PC
+- [x] Smartphone
+- [x] Tablet
+- [x] Entry入力
+- [x] 画像選択
+- [x] タップ操作
+- [x] 長文
+- [x] Settings
+- [x] Theme
 - [ ] モバイルブラウザ確認
 
 ---

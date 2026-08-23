@@ -1,14 +1,22 @@
 export type Emotion =
-  | "very_happy"
   | "happy"
-  | "neutral"
+  | "calm"
   | "sad"
-  | "very_sad"
   | "angry"
   | "anxious"
   | "tired"
-  | "excited";
-export type Weather = "sunny" | "cloudy" | "rainy" | "snowy";
+  | "excited"
+  | "very_happy"
+  | "neutral"
+  | "very_sad";
+export type Weather =
+  | "sunny"
+  | "cloudy"
+  | "rainy"
+  | "snowy"
+  | "sunny_cloudy"
+  | "sunny_rainy"
+  | "cloudy_rainy";
 export type Tag = { id: string; name: string };
 export type EntryImage = {
   id: string;
