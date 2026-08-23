@@ -2024,22 +2024,22 @@ Version 0.1完成時までにREADMEへ、
 
 # 85. Phase 3 — Entry API
 
-- [ ] Entry一覧
-- [ ] Entry詳細
-- [ ] Entry登録
-- [ ] Entry更新
-- [ ] Entry削除
-- [ ] recordedAt
-- [ ] emotion
-- [ ] weather
-- [ ] location
-- [ ] Tag一覧
-- [ ] Tag登録
-- [ ] Tag関連付け
-- [ ] Tag関連解除
-- [ ] Validation
-- [ ] Error Handling
-- [ ] Triggerログ確認
+- [x] Entry一覧
+- [x] Entry詳細
+- [x] Entry登録
+- [x] Entry更新
+- [x] Entry削除
+- [x] recordedAt
+- [x] emotion
+- [x] weather
+- [x] location
+- [x] Tag一覧
+- [x] Tag登録
+- [x] Tag関連付け
+- [x] Tag関連解除
+- [x] Validation
+- [x] Error Handling
+- [x] Triggerログ確認
 
 ---
 
