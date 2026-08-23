@@ -401,6 +401,12 @@ fieldset {
   display: flex;
   gap: 8px;
 }
+.settings-section .newtag {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
 .newtag button {
   padding: 8px 12px;
 }

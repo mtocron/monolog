@@ -214,16 +214,16 @@ function App() {
   };
   const addTag = async () => {
     if (!tagName.trim()) return;
+    setSaving(true);
+    setError("");
     try {
       const tag = await api.tags.create(tagName.trim());
       setTags((current) => [...current, tag]);
-      setForm((current) => ({
-        ...current,
-        tagIds: [...current.tagIds, tag.id],
-      }));
       setTagName("");
     } catch (reason) {
       fail(reason);
+    } finally {
+      setSaving(false);
     }
   };
   const remove = async () => {
@@ -331,10 +331,7 @@ function App() {
           tags={tags}
           editing={Boolean(editing)}
           saving={saving}
-          tagName={tagName}
-          setTagName={setTagName}
           setForm={setForm}
-          addTag={() => void addTag()}
           save={(event) => void save(event)}
           cancel={() => setPage(editing ? "detail" : "list")}
         />
@@ -344,9 +341,13 @@ function App() {
           theme={theme}
           imageRootPath={imageRootPath}
           saving={saving}
+          tags={tags}
+          tagName={tagName}
           setImageRootPath={setImageRootPath}
+          setTagName={setTagName}
           selectTheme={(nextTheme) => void changeTheme(nextTheme)}
           saveImageRootPath={() => void saveImageRootPath()}
+          addTag={() => void addTag()}
         />
       )}
     </main>
@@ -356,16 +357,24 @@ function SettingsView({
   theme,
   imageRootPath,
   saving,
+  tags,
+  tagName,
   setImageRootPath,
+  setTagName,
   selectTheme,
   saveImageRootPath,
+  addTag,
 }: {
   theme: Theme;
   imageRootPath: string;
   saving: boolean;
+  tags: Tag[];
+  tagName: string;
   setImageRootPath: (value: string) => void;
+  setTagName: (value: string) => void;
   selectTheme: (theme: Theme) => void;
   saveImageRootPath: () => void;
+  addTag: () => void;
 }) {
   const themes: { id: Theme; label: string }[] = [
     { id: "light", label: "Light" },
@@ -431,6 +440,42 @@ function SettingsView({
               </label>
             ))}
           </div>
+        </section>
+        <section className="settings-section" aria-labelledby="tags-heading">
+          <div>
+            <small>マスタ</small>
+            <h2 id="tags-heading">タグ</h2>
+          </div>
+          <form
+            className="newtag"
+            onSubmit={(event) => {
+              event.preventDefault();
+              addTag();
+            }}
+          >
+            <label className="sr-only" htmlFor="new-tag-name">
+              新しいタグ
+            </label>
+            <input
+              id="new-tag-name"
+              value={tagName}
+              maxLength={100}
+              onChange={(event) => setTagName(event.target.value)}
+              placeholder="新しいタグ"
+            />
+            <button type="submit" disabled={saving || !tagName.trim()}>
+              追加
+            </button>
+          </form>
+          {tags.length ? (
+            <div className="tags" aria-label="登録済みタグ">
+              {tags.map((tag) => (
+                <span key={tag.id}>#{tag.name}</span>
+              ))}
+            </div>
+          ) : (
+            <small>登録済みのタグはありません。</small>
+          )}
         </section>
       </div>
     </section>
@@ -532,10 +577,7 @@ function FormView({
   tags,
   editing,
   saving,
-  tagName,
-  setTagName,
   setForm,
-  addTag,
   save,
   cancel,
 }: {
@@ -543,10 +585,7 @@ function FormView({
   tags: Tag[];
   editing: boolean;
   saving: boolean;
-  tagName: string;
-  setTagName: (value: string) => void;
   setForm: (value: Form | ((current: Form) => Form)) => void;
-  addTag: () => void;
   save: (event: FormEvent) => void;
   cancel: () => void;
 }) {
@@ -656,17 +695,6 @@ function FormView({
                 <span aria-hidden="true">🏷</span> #{tag.name}
               </label>
             ))}
-          </div>
-          <div className="newtag">
-            <input
-              value={tagName}
-              maxLength={255}
-              onChange={(event) => setTagName(event.target.value)}
-              placeholder="新しいタグ"
-            />
-            <button type="button" onClick={addTag}>
-              追加
-            </button>
           </div>
         </fieldset>
         <label>
