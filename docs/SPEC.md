@@ -2066,24 +2066,24 @@ Version 0.1完成時までにREADMEへ、
 
 # 87. Phase 5 — Frontend Entry
 
-- [ ] 共通レイアウト
-- [ ] API Client
-- [ ] Timeline
-- [ ] Entry Card
-- [ ] Entry登録
-- [ ] Entry詳細
-- [ ] Entry編集
-- [ ] Entry削除
-- [ ] recordedAt
-- [ ] Tag
-- [ ] Emotion
-- [ ] Weather
-- [ ] Location
-- [ ] 複数画像
-- [ ] Preview
-- [ ] Loading
-- [ ] Error
-- [ ] 削除確認
+- [x] 共通レイアウト
+- [x] API Client
+- [x] Timeline
+- [x] Entry Card
+- [x] Entry登録
+- [x] Entry詳細
+- [x] Entry編集
+- [x] Entry削除
+- [x] recordedAt
+- [x] Tag
+- [x] Emotion
+- [x] Weather
+- [x] Location
+- [x] 複数画像
+- [x] Preview
+- [x] Loading
+- [x] Error
+- [x] 削除確認
 
 ---
 
