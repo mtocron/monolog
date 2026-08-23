@@ -15,4 +15,5 @@ coverage/
 *.log
 .DS_Store
 .idea/
-.vscode/
+.vscode/*
+!.vscode/launch.json

@@ -1,0 +1,37 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Monolog: Backend",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run start:dev",
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "name": "Monolog: Frontend",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/frontend"
+    },
+    {
+      "name": "Monolog: Browser",
+      "type": "pwa-chrome",
+      "request": "launch",
+      "url": "http://localhost:5173",
+      "webRoot": "${workspaceFolder}/frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Monolog: Full Stack",
+      "configurations": [
+        "Monolog: Backend",
+        "Monolog: Frontend",
+        "Monolog: Browser"
+      ],
+      "stopAll": true
+    }
+  ]
+}
