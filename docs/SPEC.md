@@ -1991,34 +1991,34 @@ Version 0.1完成時までにREADMEへ、
 
 ## 通常テーブル
 
-- [ ] `entries`
-- [ ] `entry_images`
-- [ ] `tags`
-- [ ] `entry_tags`
-- [ ] `entry_tags.id` ULID対応
-- [ ] `entry_tags(entry_id, tag_id)` Unique
-- [ ] Entity
-- [ ] Relation
+- [x] `entries`
+- [x] `entry_images`
+- [x] `tags`
+- [x] `entry_tags`
+- [x] `entry_tags.id` ULID対応
+- [x] `entry_tags(entry_id, tag_id)` Unique
+- [x] Entity
+- [x] Relation
 
 ## ログ
 
-- [ ] `entries_log`
-- [ ] `entry_images_log`
-- [ ] `tags_log`
-- [ ] `entry_tags_log`
-- [ ] bigint Identity PK
-- [ ] source_id
-- [ ] Trigger Function
-- [ ] INSERT Trigger
-- [ ] UPDATE Trigger
-- [ ] Index
-- [ ] INSERTログ確認
-- [ ] UPDATEログ確認
+- [x] `entries_log`
+- [x] `entry_images_log`
+- [x] `tags_log`
+- [x] `entry_tags_log`
+- [x] bigint Identity PK
+- [x] source_id
+- [x] Trigger Function
+- [x] INSERT Trigger
+- [x] UPDATE Trigger
+- [x] Index
+- [x] INSERTログ確認
+- [x] UPDATEログ確認
 
 ## Migration
 
-- [ ] up確認
-- [ ] down確認
+- [x] up確認
+- [x] down確認
 
 ---
 
