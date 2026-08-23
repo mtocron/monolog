@@ -2,6 +2,8 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { EntryTag } from './entry-tag.entity';
 import { Entry } from './entry.entity';
+import { EntryImage } from './entry-image.entity';
+import { SettingsService } from '../settings/settings.service';
 import { EntriesService } from './entries.service';
 import { Tag } from './tag.entity';
 
@@ -45,8 +47,21 @@ describe('EntriesService', () => {
         .mockImplementation((value: EntryTag) => Promise.resolve(value)),
       delete: jest.fn(),
     } as unknown as Repository<EntryTag>;
+    const entryImages = {
+      create: jest.fn((value: Partial<EntryImage>) => value),
+    } as unknown as Repository<EntryImage>;
     const dataSource = { transaction: jest.fn() } as unknown as DataSource;
-    return new EntriesService(entries, tags, entryTags, dataSource);
+    const settingsService = {
+      findByKey: jest.fn(),
+    } as unknown as SettingsService;
+    return new EntriesService(
+      entries,
+      tags,
+      entryTags,
+      entryImages,
+      dataSource,
+      settingsService,
+    );
   }
 
   it('returns an existing tag relation without creating another one', async () => {

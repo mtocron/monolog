@@ -7,13 +7,20 @@ import {
   Param,
   Post,
   Put,
+  Res,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
 import { CreateEntryDto } from './dto/create-entry.dto';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { EntryIdParamDto } from './dto/entry-id-param.dto';
+import { EntryImageParamDto } from './dto/entry-image-param.dto';
 import { EntryTagParamDto } from './dto/entry-tag-param.dto';
 import { UpdateEntryDto } from './dto/update-entry.dto';
 import { EntriesService } from './entries.service';
+import type { UploadedEntryImage } from './image-upload';
 
 @Controller()
 export class EntriesController {
@@ -38,6 +45,33 @@ export class EntriesController {
     @Param() params: EntryIdParamDto,
   ): Promise<void> {
     await this.entriesService.remove(params.id);
+  }
+
+  @Post('entries/:id/images')
+  @UseInterceptors(FilesInterceptor('images', 10))
+  uploadImages(
+    @Param() params: EntryIdParamDto,
+    @UploadedFiles() files: UploadedEntryImage[] | undefined,
+  ) {
+    return this.entriesService.addImages(params.id, files ?? []);
+  }
+
+  @Get('entries/:entryId/images/:imageId')
+  async getImage(
+    @Param() params: EntryImageParamDto,
+    @Res() response: Response,
+  ): Promise<void> {
+    const image = await this.entriesService.getImage(
+      params.entryId,
+      params.imageId,
+    );
+    response.type(image.mimeType).sendFile(image.absolutePath);
+  }
+
+  @Delete('entries/:entryId/images/:imageId') @HttpCode(204) async removeImage(
+    @Param() params: EntryImageParamDto,
+  ): Promise<void> {
+    await this.entriesService.removeImage(params.entryId, params.imageId);
   }
 
   @Get('tags') findAllTags() {

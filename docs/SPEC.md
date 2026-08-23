@@ -2045,22 +2045,22 @@ Version 0.1完成時までにREADMEへ、
 
 # 86. Phase 4 — Entry画像
 
-- [ ] multipart/form-data
-- [ ] 複数画像
-- [ ] JPEG
-- [ ] PNG
-- [ ] WebP
-- [ ] ファイルサイズValidation
-- [ ] 保存ファイル名生成
-- [ ] `image.root_path` をDBから取得
-- [ ] 相対パス保存
-- [ ] 元ファイル名保存
-- [ ] sortOrder
-- [ ] 画像取得
-- [ ] 画像削除
-- [ ] Entry削除時画像処理
-- [ ] 不整合対策
-- [ ] ログ確認
+- [x] multipart/form-data
+- [x] 複数画像
+- [x] JPEG
+- [x] PNG
+- [x] WebP
+- [x] ファイルサイズValidation
+- [x] 保存ファイル名生成
+- [x] `image.root_path` をDBから取得
+- [x] 相対パス保存
+- [x] 元ファイル名保存
+- [x] sortOrder
+- [x] 画像取得
+- [x] 画像削除
+- [x] Entry削除時画像処理
+- [x] 不整合対策
+- [x] ログ確認
 
 ---
 

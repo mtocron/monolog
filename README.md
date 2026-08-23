@@ -66,3 +66,9 @@ npm run migration:revert
 - `GET /api/settings`
 - `GET /api/settings/:key`
 - `PUT /api/settings/:key`（`image.root_path` または `appearance.theme`）
+
+## Phase 4 API
+
+- `POST /api/entries/:id/images`（multipart/form-data の `images` フィールド。JPEG / PNG / WebP、各10 MBまで、複数可）
+- `GET /api/entries/:entryId/images/:imageId`
+- `DELETE /api/entries/:entryId/images/:imageId`
