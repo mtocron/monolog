@@ -22,6 +22,9 @@ header {
   gap: 8px;
 }
 .settings-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   min-width: 44px;
   height: 44px;
@@ -29,8 +32,12 @@ header {
   border-radius: 8px;
   background: var(--color-surface);
   color: var(--color-text-primary);
-  font-size: 1.25rem;
   line-height: 1;
+}
+.settings-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke-width: 2;
 }
 .brand {
   border: 0;
@@ -206,11 +213,18 @@ form {
   font-size: 0.82rem;
 }
 .meta .meta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 32px;
   padding: 4px 8px;
   text-align: center;
-  font-size: 1.1rem;
   line-height: 1;
+}
+.meta .meta-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  stroke-width: 2;
 }
 .thumbs {
   display: flex;
@@ -373,9 +387,10 @@ fieldset {
   background: var(--color-surface);
   color: var(--color-text-secondary);
 }
-.icon-choices button > span {
-  font-size: 1.55rem;
-  line-height: 1;
+.icon-choices button > svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  stroke-width: 2;
 }
 .icon-choices button.selected {
   border-color: var(--color-primary);

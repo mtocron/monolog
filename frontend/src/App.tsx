@@ -1,5 +1,21 @@
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import {
+  Angry,
+  BatteryLow,
+  Cloud,
+  CloudRain,
+  CloudSun,
+  CloudSunRain,
+  Frown,
+  Laugh,
+  Settings,
+  Snowflake,
+  Sparkles,
+  Sun,
+  TriangleAlert,
+  type LucideIcon,
+} from "lucide-react";
 import {
   api,
   type Emotion,
@@ -11,42 +27,49 @@ import {
 } from "./api";
 import "./App.css";
 
-type IconChoice<T extends string> = { id: T; label: string; icon: string };
+type IconChoice<T extends string> = {
+  id: T;
+  label: string;
+  icon: LucideIcon;
+};
 const emotions: IconChoice<Emotion>[] = [
-  { id: "happy", label: "嬉しい", icon: "☺" },
-  { id: "calm", label: "穏やか", icon: "☻" },
-  { id: "sad", label: "悲しい", icon: "☹" },
-  { id: "angry", label: "怒り", icon: "⚡" },
-  { id: "anxious", label: "不安", icon: "◔" },
-  { id: "tired", label: "疲れた", icon: "◡" },
-  { id: "excited", label: "わくわく", icon: "✦" },
+  { id: "happy", label: "嬉しい", icon: Laugh },
+  { id: "calm", label: "穏やか", icon: Sun },
+  { id: "sad", label: "悲しい", icon: Frown },
+  { id: "angry", label: "怒り", icon: Angry },
+  { id: "anxious", label: "不安", icon: TriangleAlert },
+  { id: "tired", label: "疲れた", icon: BatteryLow },
+  { id: "excited", label: "わくわく", icon: Sparkles },
 ];
 const weather: IconChoice<Weather>[] = [
-  { id: "sunny", label: "晴れ", icon: "☀" },
-  { id: "cloudy", label: "くもり", icon: "☁" },
-  { id: "rainy", label: "雨", icon: "☂" },
-  { id: "snowy", label: "雪", icon: "❄" },
-  { id: "sunny_cloudy", label: "晴れのちくもり", icon: "🌤" },
-  { id: "sunny_rainy", label: "晴れのち雨", icon: "🌦" },
-  { id: "cloudy_rainy", label: "くもりのち雨", icon: "🌧" },
+  { id: "sunny", label: "晴れ", icon: Sun },
+  { id: "cloudy", label: "くもり", icon: Cloud },
+  { id: "rainy", label: "雨", icon: CloudRain },
+  { id: "snowy", label: "雪", icon: Snowflake },
+  { id: "sunny_cloudy", label: "晴れのちくもり", icon: CloudSun },
+  { id: "sunny_rainy", label: "晴れのち雨", icon: CloudSunRain },
+  { id: "cloudy_rainy", label: "くもりのち雨", icon: CloudRain },
 ];
 const legacyEmotionLabels: Record<string, string> = {
   very_happy: "嬉しい",
   neutral: "穏やか",
   very_sad: "悲しい",
 };
-const legacyEmotionIcons: Record<string, string> = {
-  very_happy: "☺",
-  neutral: "☻",
-  very_sad: "☹",
+const legacyEmotionIcons: Record<string, LucideIcon> = {
+  very_happy: Laugh,
+  neutral: Sun,
+  very_sad: Frown,
 };
 const label = (choices: IconChoice<string>[], value: string | null) =>
   choices.find((choice) => choice.id === value)?.label ??
   (value ? (legacyEmotionLabels[value] ?? value) : undefined);
-const icon = (choices: IconChoice<string>[], value: string) =>
+const icon = (
+  choices: IconChoice<string>[],
+  value: string,
+): LucideIcon | null =>
   choices.find((choice) => choice.id === value)?.icon ??
   legacyEmotionIcons[value] ??
-  value;
+  null;
 const dateTime = (date = new Date()) =>
   new Date(date.getTime() - date.getTimezoneOffset() * 60000)
     .toISOString()
@@ -260,7 +283,7 @@ function App() {
             title="Settings"
             onClick={() => setPage("settings")}
           >
-            ⚙
+            <Settings aria-hidden="true" />
           </button>
           <button className="primary" onClick={create}>
             記録する
@@ -482,6 +505,9 @@ function SettingsView({
   );
 }
 function Meta({ entry }: { entry: Entry }) {
+  const EmotionIcon = entry.emotion ? icon(emotions, entry.emotion) : null;
+  const WeatherIcon = entry.weather ? icon(weather, entry.weather) : null;
+
   return (
     <div className="meta">
       {entry.emotion && (
@@ -490,7 +516,7 @@ function Meta({ entry }: { entry: Entry }) {
           aria-label={label(emotions, entry.emotion)}
           title={label(emotions, entry.emotion)}
         >
-          {icon(emotions, entry.emotion)}
+          {EmotionIcon && createElement(EmotionIcon, { "aria-hidden": true })}
         </span>
       )}
       {entry.weather && (
@@ -499,7 +525,7 @@ function Meta({ entry }: { entry: Entry }) {
           aria-label={label(weather, entry.weather)}
           title={label(weather, entry.weather)}
         >
-          {icon(weather, entry.weather)}
+          {WeatherIcon && createElement(WeatherIcon, { "aria-hidden": true })}
         </span>
       )}
       {entry.location && <span>⌖ {entry.location}</span>}
@@ -572,6 +598,29 @@ function EntryView({
     </article>
   );
 }
+function IconChoiceButton<T extends string>({
+  choice,
+  selected,
+  onClick,
+}: {
+  choice: IconChoice<T>;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const Icon = choice.icon;
+
+  return (
+    <button
+      type="button"
+      className={selected ? "selected" : ""}
+      aria-label={choice.label}
+      aria-pressed={selected}
+      onClick={onClick}
+    >
+      <Icon aria-hidden="true" />
+    </button>
+  );
+}
 function FormView({
   form,
   tags,
@@ -638,18 +687,17 @@ function FormView({
             <legend>感情</legend>
             <div className="icon-choices" role="radiogroup" aria-label="感情">
               {emotions.map((choice) => (
-                <button
+                <IconChoiceButton
                   key={choice.id}
-                  type="button"
-                  className={form.emotion === choice.id ? "selected" : ""}
-                  aria-pressed={form.emotion === choice.id}
+                  choice={choice}
+                  selected={form.emotion === choice.id}
                   onClick={() =>
-                    set("emotion", form.emotion === choice.id ? null : choice.id)
+                    set(
+                      "emotion",
+                      form.emotion === choice.id ? null : choice.id,
+                    )
                   }
-                >
-                  <span aria-hidden="true">{choice.icon}</span>
-                  <span className="sr-only">{choice.label}</span>
-                </button>
+                />
               ))}
             </div>
           </fieldset>
@@ -657,18 +705,17 @@ function FormView({
             <legend>天気</legend>
             <div className="icon-choices" role="radiogroup" aria-label="天気">
               {weather.map((choice) => (
-                <button
+                <IconChoiceButton
                   key={choice.id}
-                  type="button"
-                  className={form.weather === choice.id ? "selected" : ""}
-                  aria-pressed={form.weather === choice.id}
+                  choice={choice}
+                  selected={form.weather === choice.id}
                   onClick={() =>
-                    set("weather", form.weather === choice.id ? null : choice.id)
+                    set(
+                      "weather",
+                      form.weather === choice.id ? null : choice.id,
+                    )
                   }
-                >
-                  <span aria-hidden="true">{choice.icon}</span>
-                  <span className="sr-only">{choice.label}</span>
-                </button>
+                />
               ))}
             </div>
           </fieldset>
