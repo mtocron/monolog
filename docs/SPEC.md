@@ -2126,36 +2126,36 @@ Version 0.1完成時までにREADMEへ、
 
 ## 通常テーブル
 
-- [ ] `purchase_categories`
-- [ ] `purchases`
-- [ ] `purchase_images`
-- [ ] Entity
-- [ ] Relation
-- [ ] 初期Category
+- [x] `purchase_categories`
+- [x] `purchases`
+- [x] `purchase_images`
+- [x] Entity
+- [x] Relation
+- [x] 初期Category
 
 ## ログ
 
-- [ ] `purchase_categories_log`
-- [ ] `purchases_log`
-- [ ] `purchase_images_log`
-- [ ] bigint Identity PK
-- [ ] source_id
-- [ ] Trigger Function
-- [ ] INSERT Trigger
-- [ ] UPDATE Trigger
-- [ ] Index
-- [ ] ログ確認
+- [x] `purchase_categories_log`
+- [x] `purchases_log`
+- [x] `purchase_images_log`
+- [x] bigint Identity PK
+- [x] source_id
+- [x] Trigger Function
+- [x] INSERT Trigger
+- [x] UPDATE Trigger
+- [x] Index
+- [x] ログ確認
 
 ## API
 
-- [ ] Purchase一覧
-- [ ] Purchase詳細
-- [ ] Purchase登録
-- [ ] Purchase更新
-- [ ] Purchase削除
-- [ ] Category一覧
-- [ ] Purchase画像
-- [ ] Triggerログ確認
+- [x] Purchase一覧
+- [x] Purchase詳細
+- [x] Purchase登録
+- [x] Purchase更新
+- [x] Purchase削除
+- [x] Category一覧
+- [x] Purchase画像
+- [x] Triggerログ確認
 
 ---
 
