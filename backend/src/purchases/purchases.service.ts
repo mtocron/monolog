@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { mkdir, rm, writeFile } from 'node:fs/promises';
+import { access, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname, normalize, relative, resolve } from 'node:path';
 import { DataSource, Repository } from 'typeorm';
 import { createUlid } from '../common/ulid';
@@ -133,6 +133,23 @@ export class PurchasesService {
     await this.images.delete({ id: imageId, purchaseId });
     await this.removeFiles([image]);
   }
+  async getImage(
+    purchaseId: string,
+    imageId: string,
+  ): Promise<{ absolutePath: string; mimeType: string }> {
+    const image = await this.findImage(purchaseId, imageId);
+    const absolutePath = this.resolvePath(
+      await this.imageRootPath(),
+      image.filePath,
+    );
+    try {
+      await access(absolutePath);
+    } catch {
+      this.logger.error(`Image file is missing: '${absolutePath}'`);
+      throw new NotFoundException(`Image '${imageId}' file was not found`);
+    }
+    return { absolutePath, mimeType: this.mimeTypeFor(image.filePath) };
+  }
   private async requireCategory(id: string): Promise<void> {
     if (!(await this.categories.existsBy({ id })))
       throw new NotFoundException(`Purchase category '${id}' was not found`);
@@ -176,5 +193,11 @@ export class PurchasesService {
         }
       }),
     );
+  }
+  private mimeTypeFor(filePath: string): string {
+    if (filePath.endsWith('.jpg')) return 'image/jpeg';
+    if (filePath.endsWith('.png')) return 'image/png';
+    if (filePath.endsWith('.webp')) return 'image/webp';
+    throw new NotFoundException('Unsupported stored image type');
   }
 }

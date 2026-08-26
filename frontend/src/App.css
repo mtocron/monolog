@@ -74,6 +74,71 @@ h1 {
   display: grid;
   gap: 0;
 }
+.purchase-list {
+  display: grid;
+  gap: 12px;
+}
+.purchase-card {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 14px;
+  width: 100%;
+  min-height: 108px;
+  padding: 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  text-align: left;
+}
+.purchase-card > span:last-child {
+  display: grid;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+.purchase-card strong,
+.purchase-card small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.purchase-card-image {
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--color-muted);
+}
+.purchase-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.purchase-detail h2 {
+  margin: 8px 0 0;
+  color: var(--color-heading);
+}
+.purchase-price {
+  margin: 12px 0;
+  color: var(--color-heading) !important;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.purchase-detail dl {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+.purchase-detail dl div {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: 12px;
+}
+.purchase-detail dt {
+  color: var(--color-text-secondary);
+}
+.purchase-detail dd {
+  margin: 0;
+}
 .card,
 .detail,
 form {
@@ -445,6 +510,10 @@ small {
   }
   .images {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .purchase-card {
+    grid-template-columns: 76px 1fr;
+    min-height: 92px;
   }
 }
 @media (max-width: 600px) {

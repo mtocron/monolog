@@ -7,10 +7,12 @@ import {
   Param,
   Post,
   Put,
+  Res,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import type { Response } from 'express';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PurchaseIdParamDto } from './dto/purchase-id-param.dto';
 import { PurchaseImageParamDto } from './dto/purchase-image-param.dto';
@@ -50,6 +52,17 @@ export class PurchasesController {
     @UploadedFiles() files: UploadedPurchaseImage[] | undefined,
   ) {
     return this.purchases.addImages(params.id, files ?? []);
+  }
+  @Get('purchases/:purchaseId/images/:imageId')
+  async getImage(
+    @Param() params: PurchaseImageParamDto,
+    @Res() response: Response,
+  ): Promise<void> {
+    const image = await this.purchases.getImage(
+      params.purchaseId,
+      params.imageId,
+    );
+    response.type(image.mimeType).sendFile(image.absolutePath);
   }
   @Delete('purchases/:purchaseId/images/:imageId')
   @HttpCode(204)

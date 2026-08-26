@@ -40,6 +40,35 @@ export type EntryInput = {
   weather: Weather | null;
   location: string | null;
 };
+export type PurchaseCategory = {
+  id: string;
+  name: string;
+  sortOrder: number;
+};
+export type PurchaseImage = {
+  id: string;
+  originalFileName: string;
+  sortOrder: number;
+};
+export type Purchase = {
+  id: string;
+  name: string;
+  purchaseCategoryId: string;
+  purchasedAt: string;
+  price: number;
+  shop: string | null;
+  description: string | null;
+  purchaseCategory: PurchaseCategory;
+  images: PurchaseImage[];
+};
+export type PurchaseInput = {
+  name: string;
+  purchaseCategoryId: string;
+  purchasedAt: string;
+  price: number;
+  shop: string | null;
+  description: string | null;
+};
 export type Theme = "light" | "dark" | "capture";
 export type SettingKey = "image.root_path" | "appearance.theme";
 export type AppSetting = {
@@ -100,6 +129,37 @@ export const api = {
       }),
     imageUrl: (entryId: string, imageId: string) =>
       `/api/entries/${entryId}/images/${imageId}`,
+  },
+  purchases: {
+    list: () => request<Purchase[]>("/purchases"),
+    get: (id: string) => request<Purchase>(`/purchases/${id}`),
+    create: (input: PurchaseInput) =>
+      request<Purchase>("/purchases", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    update: (id: string, input: PurchaseInput) =>
+      request<Purchase>(`/purchases/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(input),
+      }),
+    remove: (id: string) =>
+      request<void>(`/purchases/${id}`, { method: "DELETE" }),
+    listCategories: () => request<PurchaseCategory[]>("/purchase-categories"),
+    uploadImages: (id: string, files: File[]) => {
+      const body = new FormData();
+      files.forEach((file) => body.append("images", file));
+      return request<PurchaseImage[]>(`/purchases/${id}/images`, {
+        method: "POST",
+        body,
+      });
+    },
+    removeImage: (purchaseId: string, imageId: string) =>
+      request<void>(`/purchases/${purchaseId}/images/${imageId}`, {
+        method: "DELETE",
+      }),
+    imageUrl: (purchaseId: string, imageId: string) =>
+      `/api/purchases/${purchaseId}/images/${imageId}`,
   },
   tags: {
     list: () => request<Tag[]>("/tags"),

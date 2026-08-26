@@ -2161,20 +2161,20 @@ Version 0.1完成時までにREADMEへ、
 
 # 91. Phase 9 — Purchase Frontend
 
-- [ ] Purchase一覧
-- [ ] Purchase登録
-- [ ] Purchase詳細
-- [ ] Purchase編集
-- [ ] Purchase削除
-- [ ] Category
-- [ ] PurchasedAt
-- [ ] Price
-- [ ] Shop
-- [ ] Description
-- [ ] 複数画像
-- [ ] Preview
-- [ ] Responsive
-- [ ] 全Theme表示確認
+- [x] Purchase一覧
+- [x] Purchase登録
+- [x] Purchase詳細
+- [x] Purchase編集
+- [x] Purchase削除
+- [x] Category
+- [x] PurchasedAt
+- [x] Price
+- [x] Shop
+- [x] Description
+- [x] 複数画像
+- [x] Preview
+- [x] Responsive
+- [x] 全Theme表示確認
 
 ---
 

@@ -25,6 +25,7 @@ import {
   type Tag,
   type Weather,
 } from "./api";
+import { PurchasesPage } from "./PurchasesPage";
 import "./App.css";
 
 type IconChoice<T extends string> = {
@@ -96,9 +97,9 @@ function App() {
   const [entry, setEntry] = useState<Entry | null>(null);
   const [editing, setEditing] = useState<Entry | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
-  const [page, setPage] = useState<"list" | "detail" | "form" | "settings">(
-    "list",
-  );
+  const [page, setPage] = useState<
+    "list" | "detail" | "form" | "settings" | "purchases"
+  >("list");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -277,6 +278,7 @@ function App() {
           monolog
         </button>
         <div className="header-actions">
+          <button onClick={() => setPage("purchases")}>購入記録</button>
           <button
             className="settings-button"
             aria-label="Settings"
@@ -373,6 +375,7 @@ function App() {
           addTag={() => void addTag()}
         />
       )}
+      {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} />}
     </main>
   );
 }
