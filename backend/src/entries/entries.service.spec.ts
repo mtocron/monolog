@@ -1,6 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { DataSource, Repository } from 'typeorm';
 import { EntryTag } from './entry-tag.entity';
+import { EntryPurchase } from './entry-purchase.entity';
 import { Entry } from './entry.entity';
 import { EntryImage } from './entry-image.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -19,6 +20,7 @@ describe('EntriesService', () => {
     updatedAt: new Date(),
     images: [],
     entryTags: [],
+    entryPurchases: [],
   };
 
   function createService(overrides: Record<string, unknown> = {}) {
@@ -50,6 +52,14 @@ describe('EntriesService', () => {
     const entryImages = {
       create: jest.fn((value: Partial<EntryImage>) => value),
     } as unknown as Repository<EntryImage>;
+    const entryPurchases = {
+      findOneBy: jest.fn().mockResolvedValue(null),
+      create: jest.fn((value: Partial<EntryPurchase>) => value),
+      save: jest
+        .fn()
+        .mockImplementation((value: EntryPurchase) => Promise.resolve(value)),
+      delete: jest.fn(),
+    } as unknown as Repository<EntryPurchase>;
     const dataSource = { transaction: jest.fn() } as unknown as DataSource;
     const settingsService = {
       findByKey: jest.fn(),
@@ -59,6 +69,7 @@ describe('EntriesService', () => {
       tags,
       entryTags,
       entryImages,
+      entryPurchases,
       dataSource,
       settingsService,
     );

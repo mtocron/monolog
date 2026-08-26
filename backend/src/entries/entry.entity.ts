@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { EntryImage } from './entry-image.entity';
 import { EntryTag } from './entry-tag.entity';
+import { EntryPurchase } from './entry-purchase.entity';
 
 @Entity('entries')
 export class Entry {
@@ -40,4 +41,7 @@ export class Entry {
 
   @OneToMany(() => EntryTag, (entryTag) => entryTag.entry)
   entryTags!: EntryTag[];
+
+  @OneToMany(() => EntryPurchase, (entryPurchase) => entryPurchase.entry)
+  entryPurchases!: EntryPurchase[];
 }

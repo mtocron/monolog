@@ -15,12 +15,18 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateEntryDto } from './dto/update-entry.dto';
 import { EntryImage } from './entry-image.entity';
 import { EntryTag } from './entry-tag.entity';
+import { EntryPurchase } from './entry-purchase.entity';
 import { Entry } from './entry.entity';
 import { Tag } from './tag.entity';
+import { Purchase } from '../purchases/purchase.entity';
 import { SettingsService } from '../settings/settings.service';
 import { UploadedEntryImage, validateEntryImage } from './image-upload';
 
-const entryRelations = { images: true, entryTags: { tag: true } } as const;
+const entryRelations = {
+  images: true,
+  entryTags: { tag: true },
+  entryPurchases: { purchase: { purchaseCategory: true, images: true } },
+} as const;
 
 function isUniqueViolation(error: unknown): boolean {
   return (
@@ -45,6 +51,8 @@ export class EntriesService {
     private readonly entryTags: Repository<EntryTag>,
     @InjectRepository(EntryImage)
     private readonly entryImages: Repository<EntryImage>,
+    @InjectRepository(EntryPurchase)
+    private readonly entryPurchases: Repository<EntryPurchase>,
     private readonly dataSource: DataSource,
     private readonly settingsService: SettingsService,
   ) {}
@@ -88,6 +96,7 @@ export class EntriesService {
     const entry = await this.findOne(id);
     await this.dataSource.transaction(async (manager) => {
       await manager.delete(EntryTag, { entryId: id });
+      await manager.delete(EntryPurchase, { entryId: id });
       await manager.delete(EntryImage, { entryId: id });
       await manager.delete(Entry, { id });
     });
@@ -223,6 +232,43 @@ export class EntriesService {
     const result = await this.entryTags.delete({ entryId, tagId });
     if (!result.affected)
       throw new NotFoundException('Tag relation was not found');
+  }
+
+  async attachPurchase(
+    entryId: string,
+    purchaseId: string,
+  ): Promise<EntryPurchase> {
+    await this.findOne(entryId);
+    const purchaseExists = await this.dataSource
+      .getRepository(Purchase)
+      .existsBy({ id: purchaseId });
+    if (!purchaseExists)
+      throw new NotFoundException(`Purchase '${purchaseId}' was not found`);
+    const existing = await this.entryPurchases.findOneBy({
+      entryId,
+      purchaseId,
+    });
+    if (existing) return existing;
+    try {
+      return await this.entryPurchases.save(
+        this.entryPurchases.create({ id: createUlid(), entryId, purchaseId }),
+      );
+    } catch (error: unknown) {
+      if (isUniqueViolation(error)) {
+        const relation = await this.entryPurchases.findOneBy({
+          entryId,
+          purchaseId,
+        });
+        if (relation) return relation;
+      }
+      throw error;
+    }
+  }
+
+  async detachPurchase(entryId: string, purchaseId: string): Promise<void> {
+    const result = await this.entryPurchases.delete({ entryId, purchaseId });
+    if (!result.affected)
+      throw new NotFoundException('Purchase relation was not found');
   }
 
   private async findImage(

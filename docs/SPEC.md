@@ -2182,27 +2182,27 @@ Version 0.1完成時までにREADMEへ、
 
 ## DB
 
-- [ ] `entry_purchases`
-- [ ] 独立ULID `id`
-- [ ] `(entry_id, purchase_id)` Unique
-- [ ] `entry_purchases_log`
-- [ ] bigint IdentityログID
-- [ ] source_id
-- [ ] Trigger
-- [ ] Index
-- [ ] Migration
-- [ ] ログ確認
+- [x] `entry_purchases`
+- [x] 独立ULID `id`
+- [x] `(entry_id, purchase_id)` Unique
+- [x] `entry_purchases_log`
+- [x] bigint IdentityログID
+- [x] source_id
+- [x] Trigger
+- [x] Index
+- [x] Migration
+- [x] ログ確認
 
 ## Application
 
-- [ ] EntryからPurchase関連付け
-- [ ] 関連解除
-- [ ] Entry詳細表示
-- [ ] Purchase詳細表示
-- [ ] Entry登録時Purchase選択
-- [ ] Entry編集時Purchase選択
-- [ ] Purchase選択UI
-- [ ] Purchase検索UI
+- [x] EntryからPurchase関連付け
+- [x] 関連解除
+- [x] Entry詳細表示
+- [x] Purchase詳細表示
+- [x] Entry登録時Purchase選択
+- [x] Entry編集時Purchase選択
+- [x] Purchase選択UI
+- [x] Purchase検索UI
 
 ---
 

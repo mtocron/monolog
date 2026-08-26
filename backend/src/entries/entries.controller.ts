@@ -18,6 +18,7 @@ import { CreateTagDto } from './dto/create-tag.dto';
 import { EntryIdParamDto } from './dto/entry-id-param.dto';
 import { EntryImageParamDto } from './dto/entry-image-param.dto';
 import { EntryTagParamDto } from './dto/entry-tag-param.dto';
+import { EntryPurchaseParamDto } from './dto/entry-purchase-param.dto';
 import { UpdateEntryDto } from './dto/update-entry.dto';
 import { EntriesService } from './entries.service';
 import type { UploadedEntryImage } from './image-upload';
@@ -89,5 +90,18 @@ export class EntriesController {
     @Param() params: EntryTagParamDto,
   ): Promise<void> {
     await this.entriesService.detachTag(params.entryId, params.tagId);
+  }
+  @Post('entries/:entryId/purchases/:purchaseId')
+  attachPurchase(@Param() params: EntryPurchaseParamDto) {
+    return this.entriesService.attachPurchase(
+      params.entryId,
+      params.purchaseId,
+    );
+  }
+
+  @Delete('entries/:entryId/purchases/:purchaseId')
+  @HttpCode(204)
+  async detachPurchase(@Param() params: EntryPurchaseParamDto): Promise<void> {
+    await this.entriesService.detachPurchase(params.entryId, params.purchaseId);
   }
 }

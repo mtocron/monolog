@@ -19,8 +19,13 @@ import {
 import { PurchaseCategory } from './purchase-category.entity';
 import { PurchaseImage } from './purchase-image.entity';
 import { Purchase } from './purchase.entity';
+import { EntryPurchase } from '../entries/entry-purchase.entity';
 
-const purchaseRelations = { purchaseCategory: true, images: true } as const;
+const purchaseRelations = {
+  purchaseCategory: true,
+  images: true,
+  entryPurchases: { entry: true },
+} as const;
 
 @Injectable()
 export class PurchasesService {
@@ -32,6 +37,8 @@ export class PurchasesService {
     private readonly categories: Repository<PurchaseCategory>,
     @InjectRepository(PurchaseImage)
     private readonly images: Repository<PurchaseImage>,
+    @InjectRepository(EntryPurchase)
+    private readonly entryPurchases: Repository<EntryPurchase>,
     private readonly dataSource: DataSource,
     private readonly settingsService: SettingsService,
   ) {}
@@ -79,6 +86,7 @@ export class PurchasesService {
     const purchase = await this.findOne(id);
     await this.dataSource.transaction(async (manager) => {
       await manager.delete(PurchaseImage, { purchaseId: id });
+      await manager.delete(EntryPurchase, { purchaseId: id });
       await manager.delete(Purchase, { id });
     });
     await this.removeFiles(purchase.images);

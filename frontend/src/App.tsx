@@ -21,6 +21,7 @@ import {
   type Emotion,
   type Entry,
   type EntryInput,
+  type Purchase,
   type Theme,
   type Tag,
   type Weather,
@@ -80,7 +81,7 @@ const format = (value: string) =>
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
-type Form = EntryInput & { tagIds: string[]; files: File[] };
+type Form = EntryInput & { tagIds: string[]; purchaseIds: string[]; files: File[] };
 const emptyForm = (): Form => ({
   content: "",
   recordedAt: new Date().toISOString(),
@@ -88,12 +89,14 @@ const emptyForm = (): Form => ({
   weather: null,
   location: null,
   tagIds: [],
+  purchaseIds: [],
   files: [],
 });
 
 function App() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [entry, setEntry] = useState<Entry | null>(null);
   const [editing, setEditing] = useState<Entry | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
@@ -111,13 +114,15 @@ function App() {
   const reload = async () => {
     setLoading(true);
     try {
-      const [nextEntries, nextTags, settings] = await Promise.all([
+      const [nextEntries, nextTags, nextPurchases, settings] = await Promise.all([
         api.entries.list(),
         api.tags.list(),
+        api.purchases.list(),
         api.settings.list(),
       ]);
       setEntries(nextEntries);
       setTags(nextTags);
+      setPurchases(nextPurchases);
       const values = new Map(
         settings.map((setting) => [setting.key, setting.value]),
       );
@@ -195,6 +200,7 @@ function App() {
       weather: entry.weather,
       location: entry.location,
       tagIds: entry.entryTags.map((relation) => relation.tagId),
+      purchaseIds: entry.entryPurchases.map((relation) => relation.purchaseId),
       files: [],
     });
     setPage("form");
@@ -224,6 +230,17 @@ function App() {
         ...[...old]
           .filter((id) => !form.tagIds.includes(id))
           .map((id) => api.entries.detachTag(saved.id, id)),
+        ...form.purchaseIds
+          .filter(
+            (id) =>
+              !editing?.entryPurchases.some(
+                (relation) => relation.purchaseId === id,
+              ),
+          )
+          .map((id) => api.entries.attachPurchase(saved.id, id)),
+        ...(editing?.entryPurchases.map((relation) => relation.purchaseId) ?? [])
+          .filter((id) => !form.purchaseIds.includes(id))
+          .map((id) => api.entries.detachPurchase(saved.id, id)),
       ]);
       if (form.files.length)
         await api.entries.uploadImages(saved.id, form.files);
@@ -354,6 +371,7 @@ function App() {
         <FormView
           form={form}
           tags={tags}
+          purchases={purchases}
           editing={Boolean(editing)}
           saving={saving}
           setForm={setForm}
@@ -598,6 +616,14 @@ function EntryView({
       )}
       <Meta entry={entry} />
       <Tags entry={entry} />
+      {entry.entryPurchases.length > 0 && (
+        <div className="related-records">
+          <strong>関連する購入記録</strong>
+          {entry.entryPurchases.map((relation) => (
+            <span key={relation.id}>{relation.purchase.name}</span>
+          ))}
+        </div>
+      )}
     </article>
   );
 }
@@ -627,6 +653,7 @@ function IconChoiceButton<T extends string>({
 function FormView({
   form,
   tags,
+  purchases,
   editing,
   saving,
   setForm,
@@ -635,6 +662,7 @@ function FormView({
 }: {
   form: Form;
   tags: Tag[];
+  purchases: Purchase[];
   editing: boolean;
   saving: boolean;
   setForm: (value: Form | ((current: Form) => Form)) => void;
@@ -747,6 +775,11 @@ function FormView({
             ))}
           </div>
         </fieldset>
+        <PurchasePicker
+          purchases={purchases}
+          selectedIds={form.purchaseIds}
+          onChange={(purchaseIds) => set("purchaseIds", purchaseIds)}
+        />
         <label>
           画像（JPEG / PNG / WebP、最大10枚）
           <input
@@ -771,6 +804,55 @@ function FormView({
         </div>
       </form>
     </section>
+  );
+}
+
+function PurchasePicker({
+  purchases,
+  selectedIds,
+  onChange,
+}: {
+  purchases: Purchase[];
+  selectedIds: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const normalizedQuery = query.trim().toLocaleLowerCase("ja-JP");
+  const matches = purchases.filter((purchase) =>
+    purchase.name.toLocaleLowerCase("ja-JP").includes(normalizedQuery),
+  );
+  const toggle = (id: string) =>
+    onChange(
+      selectedIds.includes(id)
+        ? selectedIds.filter((selectedId) => selectedId !== id)
+        : [...selectedIds, id],
+    );
+
+  return (
+    <fieldset className="purchase-picker">
+      <legend>関連する購入記録</legend>
+      <input
+        type="search"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        placeholder="購入記録を検索"
+        aria-label="購入記録を検索"
+      />
+      <div className="purchase-choices">
+        {matches.map((purchase) => (
+          <label className="purchase-choice" key={purchase.id}>
+            <input
+              type="checkbox"
+              checked={selectedIds.includes(purchase.id)}
+              onChange={() => toggle(purchase.id)}
+            />
+            <span>{purchase.name}</span>
+            <small>{purchase.purchasedAt}</small>
+          </label>
+        ))}
+        {matches.length === 0 && <small>該当する購入記録はありません。</small>}
+      </div>
+    </fieldset>
   );
 }
 export default App;

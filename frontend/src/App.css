@@ -425,6 +425,42 @@ fieldset {
   background: var(--color-primary);
   color: var(--color-primary-text);
 }
+.purchase-picker {
+  gap: 10px;
+}
+.purchase-picker legend,
+.related-records strong {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+.purchase-choices,
+.related-records {
+  display: grid;
+  gap: 8px;
+}
+.purchase-choices {
+  max-height: 220px;
+  overflow-y: auto;
+}
+.purchase-choice,
+.related-records span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 9px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+}
+.purchase-choice input {
+  width: auto;
+}
+.purchase-choice small {
+  margin-left: auto;
+}
+.related-records {
+  margin-top: 18px;
+}
 .icon-picker {
   gap: 10px;
 }

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { PurchaseCategory } from './purchase-category.entity';
 import { PurchaseImage } from './purchase-image.entity';
+import { EntryPurchase } from '../entries/entry-purchase.entity';
 
 @Entity('purchases')
 export class Purchase {
@@ -30,4 +31,6 @@ export class Purchase {
   purchaseCategory!: PurchaseCategory;
   @OneToMany(() => PurchaseImage, (image) => image.purchase)
   images!: PurchaseImage[];
+  @OneToMany(() => EntryPurchase, (entryPurchase) => entryPurchase.purchase)
+  entryPurchases!: EntryPurchase[];
 }

@@ -218,6 +218,14 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
               )}
             </dl>
             {purchase.description && <p>{purchase.description}</p>}
+            {purchase.entryPurchases.length > 0 && (
+              <div className="related-records">
+                <strong>関連する記録</strong>
+                {purchase.entryPurchases.map((relation) => (
+                  <span key={relation.id}>{relation.entry.content}</span>
+                ))}
+              </div>
+            )}
             {purchase.images.length > 0 && (
               <div className="images">
                 {purchase.images.map((image) => (

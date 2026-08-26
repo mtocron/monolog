@@ -32,6 +32,7 @@ export type Entry = {
   location: string | null;
   images: EntryImage[];
   entryTags: { id: string; tagId: string; tag: Tag }[];
+  entryPurchases: { id: string; purchaseId: string; purchase: Purchase }[];
 };
 export type EntryInput = {
   content: string;
@@ -60,6 +61,7 @@ export type Purchase = {
   description: string | null;
   purchaseCategory: PurchaseCategory;
   images: PurchaseImage[];
+  entryPurchases: { id: string; entryId: string; entry: Entry }[];
 };
 export type PurchaseInput = {
   name: string;
@@ -118,6 +120,14 @@ export const api = {
       request<void>(`/entries/${entryId}/tags/${tagId}`, { method: "POST" }),
     detachTag: (entryId: string, tagId: string) =>
       request<void>(`/entries/${entryId}/tags/${tagId}`, { method: "DELETE" }),
+    attachPurchase: (entryId: string, purchaseId: string) =>
+      request<void>(`/entries/${entryId}/purchases/${purchaseId}`, {
+        method: "POST",
+      }),
+    detachPurchase: (entryId: string, purchaseId: string) =>
+      request<void>(`/entries/${entryId}/purchases/${purchaseId}`, {
+        method: "DELETE",
+      }),
     uploadImages: (id: string, files: File[]) => {
       const body = new FormData();
       files.forEach((file) => body.append("images", file));
