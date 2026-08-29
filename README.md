@@ -21,6 +21,10 @@ docker compose up -d --build
 docker compose down
 ```
 
+`postgres_data` and `image_data` are persistent Docker volumes. The backend
+applies pending TypeORM migrations before starting, and image files are stored
+under `/data/monolog/images` in the `image_data` volume.
+
 ## ローカル起動
 
 PostgreSQL を起動したうえで、別々のターミナルから実行します。

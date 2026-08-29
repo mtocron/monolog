@@ -85,6 +85,10 @@ header,
 header {
   min-height: 76px;
   border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  background: var(--color-background);
 }
 .header-actions {
   display: flex;
