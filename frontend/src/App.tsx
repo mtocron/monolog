@@ -17,7 +17,6 @@ import {
   Sparkles,
   Sun,
   TriangleAlert,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -629,7 +628,7 @@ function CreateMenu({ onSelect }: { onSelect: (kind: CreateKind) => void }) {
   return (
     <div className="create-menu" ref={containerRef}>
       {open && <button type="button" className="create-overlay" aria-label="作成メニューを閉じる" onClick={close} />}
-      <div className={`create-dropdown${open ? " open" : ""}`} role="menu" aria-label="作成メニュー">
+      <div className={`create-dropdown${open ? " open" : ""}`} role="menu" aria-label="作成メニュー" aria-hidden={!open}>
         <button type="button" className="create-purchase" role="menuitem" onClick={() => select("purchase")}>
           <ShoppingBag aria-hidden="true" />購入記録
         </button>
@@ -639,7 +638,7 @@ function CreateMenu({ onSelect }: { onSelect: (kind: CreateKind) => void }) {
       </div>
       <button type="button" className="create-trigger primary" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
         <span className="create-trigger-label"><Plus aria-hidden="true" /> 作成 <span aria-hidden="true">▼</span></span>
-        <span className="create-fab-icon" aria-hidden="true">{open ? <X /> : <Plus />}</span>
+        <span className="create-fab-icon" aria-hidden="true"><Plus /></span>
         <span className="sr-only">{open ? "作成メニューを閉じる" : "作成メニューを開く"}</span>
       </button>
     </div>
