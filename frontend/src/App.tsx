@@ -328,7 +328,6 @@ function App() {
         </button>
         <div className="header-actions">
           <button onClick={() => setPage("search")}>Search</button>
-          <button onClick={() => setPage("purchases")}>購入記録</button>
           <button
             className="settings-button"
             aria-label="Settings"
@@ -337,12 +336,12 @@ function App() {
           >
             <Settings aria-hidden="true" />
           </button>
+          <CreateMenu onSelect={openCreate} />
           <button className="primary" onClick={create}>
             記録する
           </button>
         </div>
       </header>
-      <CreateMenu onSelect={openCreate} />
       {error && <Notice kind="error" onClose={() => setError("")}>{error}</Notice>}
       {success && <Notice kind="success" onClose={() => setSuccess("")}>{success}</Notice>}
       {page === "list" && (
@@ -631,11 +630,11 @@ function CreateMenu({ onSelect }: { onSelect: (kind: CreateKind) => void }) {
     <div className="create-menu" ref={containerRef}>
       {open && <button type="button" className="create-overlay" aria-label="作成メニューを閉じる" onClick={close} />}
       <div className={`create-dropdown${open ? " open" : ""}`} role="menu" aria-label="作成メニュー">
-        <button type="button" role="menuitem" onClick={() => select("entry")}>
-          <FileText aria-hidden="true" />記録
-        </button>
-        <button type="button" role="menuitem" onClick={() => select("purchase")}>
+        <button type="button" className="create-purchase" role="menuitem" onClick={() => select("purchase")}>
           <ShoppingBag aria-hidden="true" />購入記録
+        </button>
+        <button type="button" className="create-entry" role="menuitem" onClick={() => select("entry")}>
+          <FileText aria-hidden="true" />記録
         </button>
       </div>
       <button type="button" className="create-trigger primary" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>

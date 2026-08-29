@@ -29,7 +29,7 @@ const yen = (price: number) =>
   }).format(price);
 
 export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened, startCreating, onCreateStarted }: { onBack: () => void; initialPurchaseId: string | null; onPurchaseOpened: () => void; startCreating: boolean; onCreateStarted: () => void }) {
-  const [page, setPage] = useState<Page>("list");
+  const [page, setPage] = useState<Page>("detail");
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [categories, setCategories] = useState<PurchaseCategory[]>([]);
   const [purchase, setPurchase] = useState<Purchase | null>(null);
@@ -134,7 +134,7 @@ export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened, sta
     try {
       await api.purchases.remove(purchase.id);
       setPurchase(null);
-      setPage("list");
+      onBack();
       await reload();
       setSuccess("購入記録を削除しました。");
     } catch (reason) {
@@ -208,7 +208,7 @@ export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened, sta
       {page === "detail" && purchase && (
         <>
           <div className="actions">
-            <button onClick={() => setPage("list")}>一覧へ</button>
+            <button onClick={onBack}>Timelineへ戻る</button>
             <span>
               <button onClick={startEdit}>編集</button>
               <button className="danger" onClick={() => setDeleteTarget("purchase")}>
@@ -270,11 +270,11 @@ export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened, sta
           editing={Boolean(editing)}
           setForm={setForm}
           save={save}
-          cancel={() => setPage(editing ? "detail" : "list")}
+          cancel={() => editing ? setPage("detail") : onBack()}
         />
       )}
       <p className="right">
-        <button onClick={onBack}>記録一覧へ戻る</button>
+        <button onClick={onBack}>Timelineへ戻る</button>
       </p>
       <ConfirmDialog
         open={deleteTarget !== null}
