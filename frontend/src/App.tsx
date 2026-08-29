@@ -27,6 +27,7 @@ import {
   type Weather,
 } from "./api";
 import { PurchasesPage } from "./PurchasesPage";
+import { SearchPage } from "./SearchPage";
 import { ConfirmDialog, EmptyState, ImageFilePreview, LoadingState, Notice } from "./Ux";
 import "./App.css";
 
@@ -102,8 +103,9 @@ function App() {
   const [editing, setEditing] = useState<Entry | null>(null);
   const [form, setForm] = useState<Form>(emptyForm);
   const [page, setPage] = useState<
-    "list" | "detail" | "form" | "settings" | "purchases"
+    "list" | "detail" | "form" | "settings" | "purchases" | "search"
   >("list");
+  const [selectedPurchaseId, setSelectedPurchaseId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -303,6 +305,7 @@ function App() {
           monolog
         </button>
         <div className="header-actions">
+          <button onClick={() => setPage("search")}>Search</button>
           <button onClick={() => setPage("purchases")}>購入記録</button>
           <button
             className="settings-button"
@@ -397,7 +400,8 @@ function App() {
           addTag={() => void addTag()}
         />
       )}
-      {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} />}
+      {page === "search" && <SearchPage onEntry={(id) => void detail(id)} onPurchase={(id) => { setSelectedPurchaseId(id); setPage("purchases"); }} />}
+      {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} initialPurchaseId={selectedPurchaseId} onPurchaseOpened={() => setSelectedPurchaseId(null)} />}
       <ConfirmDialog
         open={deleteTarget !== null}
         title={deleteTarget === "entry" ? "記録を削除しますか？" : "画像を削除しますか？"}

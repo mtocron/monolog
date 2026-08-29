@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UploadedFiles,
   UseInterceptors,
@@ -20,6 +21,7 @@ import { EntryImageParamDto } from './dto/entry-image-param.dto';
 import { EntryTagParamDto } from './dto/entry-tag-param.dto';
 import { EntryPurchaseParamDto } from './dto/entry-purchase-param.dto';
 import { UpdateEntryDto } from './dto/update-entry.dto';
+import { SearchEntriesDto } from './dto/search-entries.dto';
 import { EntriesService } from './entries.service';
 import type { UploadedEntryImage } from './image-upload';
 
@@ -27,8 +29,8 @@ import type { UploadedEntryImage } from './image-upload';
 export class EntriesController {
   constructor(private readonly entriesService: EntriesService) {}
 
-  @Get('entries') findAll() {
-    return this.entriesService.findAll();
+  @Get('entries') findAll(@Query() query: SearchEntriesDto) {
+    return this.entriesService.findAll(query);
   }
   @Get('entries/:id') findOne(@Param() params: EntryIdParamDto) {
     return this.entriesService.findOne(params.id);

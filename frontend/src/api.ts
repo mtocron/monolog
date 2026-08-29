@@ -71,6 +71,23 @@ export type PurchaseInput = {
   shop: string | null;
   description: string | null;
 };
+export type EntrySearch = {
+  content?: string;
+  tag?: string;
+  recordedFrom?: string;
+  recordedTo?: string;
+  emotion?: Emotion;
+  location?: string;
+};
+export type PurchaseSearch = {
+  name?: string;
+  purchaseCategoryId?: string;
+  purchasedFrom?: string;
+  purchasedTo?: string;
+  shop?: string;
+  minPrice?: number;
+  maxPrice?: number;
+};
 export type Theme = "light" | "dark" | "capture";
 export type SettingKey = "image.root_path" | "appearance.theme";
 export type AppSetting = {
@@ -80,6 +97,14 @@ export type AppSetting = {
   description: string | null;
 };
 type Failure = { message?: string | string[] };
+const queryString = (query: Record<string, string | number | undefined>) => {
+  const params = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  });
+  const value = params.toString();
+  return value ? `?${value}` : "";
+};
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`/api${path}`, {
     headers:
@@ -102,7 +127,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 export const api = {
   entries: {
-    list: () => request<Entry[]>("/entries"),
+    list: (query: EntrySearch = {}) =>
+      request<Entry[]>(`/entries${queryString(query)}`),
     get: (id: string) => request<Entry>(`/entries/${id}`),
     create: (input: EntryInput) =>
       request<Entry>("/entries", {
@@ -141,7 +167,8 @@ export const api = {
       `/api/entries/${entryId}/images/${imageId}`,
   },
   purchases: {
-    list: () => request<Purchase[]>("/purchases"),
+    list: (query: PurchaseSearch = {}) =>
+      request<Purchase[]>(`/purchases${queryString(query)}`),
     get: (id: string) => request<Purchase>(`/purchases/${id}`),
     create: (input: PurchaseInput) =>
       request<Purchase>("/purchases", {

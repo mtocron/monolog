@@ -78,6 +78,14 @@ h1 {
   display: grid;
   gap: 12px;
 }
+.search-form { gap: 28px; }
+.search-form section, .search-results { display: grid; gap: 14px; }
+.search-form h2, .search-results h2 { margin: 0; color: var(--color-heading); font-size: 1.2rem; }
+.search-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.search-grid label { display: grid; gap: 8px; color: var(--color-text-primary); font-weight: 600; }
+.search-results { margin-top: 28px; }
+.search-result { display: grid; gap: 5px; width: 100%; padding: 16px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface); color: var(--color-text-primary); text-align: left; }
+.search-result strong, .search-result small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .purchase-card {
   display: grid;
   grid-template-columns: 92px 1fr;
@@ -683,6 +691,7 @@ small {
   .grid {
     grid-template-columns: 1fr;
   }
+  .search-grid { grid-template-columns: 1fr; }
   .selection-row {
     gap: 10px;
   }

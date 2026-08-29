@@ -21,6 +21,7 @@ import { Tag } from './tag.entity';
 import { Purchase } from '../purchases/purchase.entity';
 import { SettingsService } from '../settings/settings.service';
 import { UploadedEntryImage, validateEntryImage } from './image-upload';
+import { SearchEntriesDto } from './dto/search-entries.dto';
 
 const entryRelations = {
   images: true,
@@ -57,16 +58,44 @@ export class EntriesService {
     private readonly settingsService: SettingsService,
   ) {}
 
-  findAll(): Promise<Entry[]> {
-    return this.entries.find({
-      relations: entryRelations,
-      order: {
-        recordedAt: 'DESC',
-        createdAt: 'DESC',
-        id: 'DESC',
-        images: { sortOrder: 'ASC' },
-      },
-    });
+  findAll(query: SearchEntriesDto = {}): Promise<Entry[]> {
+    const builder = this.entries
+      .createQueryBuilder('entry')
+      .leftJoinAndSelect('entry.images', 'image')
+      .leftJoinAndSelect('entry.entryTags', 'entryTag')
+      .leftJoinAndSelect('entryTag.tag', 'tag')
+      .leftJoinAndSelect('entry.entryPurchases', 'entryPurchase')
+      .leftJoinAndSelect('entryPurchase.purchase', 'purchase')
+      .leftJoinAndSelect('purchase.purchaseCategory', 'purchaseCategory')
+      .leftJoinAndSelect('purchase.images', 'purchaseImage');
+    if (query.content)
+      builder.andWhere('entry.content ILIKE :content', {
+        content: `%${query.content}%`,
+      });
+    if (query.tag)
+      builder.andWhere('tag.name ILIKE :tag', { tag: `%${query.tag}%` });
+    if (query.recordedFrom)
+      builder.andWhere('entry.recorded_at >= :recordedFrom', {
+        recordedFrom: `${query.recordedFrom}T00:00:00.000Z`,
+      });
+    if (query.recordedTo)
+      builder.andWhere(
+        "entry.recorded_at < (CAST(:recordedTo AS date) + INTERVAL '1 day')",
+        { recordedTo: query.recordedTo },
+      );
+    if (query.emotion)
+      builder.andWhere('entry.emotion = :emotion', { emotion: query.emotion });
+    if (query.location)
+      builder.andWhere('entry.location ILIKE :location', {
+        location: `%${query.location}%`,
+      });
+    return builder
+      .orderBy('entry.recorded_at', 'DESC')
+      .addOrderBy('entry.created_at', 'DESC')
+      .addOrderBy('entry.id', 'DESC')
+      .addOrderBy('image.sort_order', 'ASC')
+      .addOrderBy('purchaseImage.sort_order', 'ASC')
+      .getMany();
   }
 
   async findOne(id: string): Promise<Entry> {

@@ -2228,19 +2228,19 @@ Version 0.1完成時までにREADMEへ、
 
 ## Entry
 
-- [ ] 本文
-- [ ] Tag
-- [ ] 日付
-- [ ] Emotion
-- [ ] Location
+- [x] 本文
+- [x] Tag
+- [x] 日付
+- [x] Emotion
+- [x] Location
 
 ## Purchase
 
-- [ ] Name
-- [ ] Category
-- [ ] 購入日
-- [ ] Shop
-- [ ] 金額
+- [x] Name
+- [x] Category
+- [x] 購入日
+- [x] Shop
+- [x] 金額
 
 専用検索エンジンは導入しない。
 

@@ -28,7 +28,7 @@ const yen = (price: number) =>
     maximumFractionDigits: 0,
   }).format(price);
 
-export function PurchasesPage({ onBack }: { onBack: () => void }) {
+export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened }: { onBack: () => void; initialPurchaseId: string | null; onPurchaseOpened: () => void }) {
   const [page, setPage] = useState<Page>("list");
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [categories, setCategories] = useState<PurchaseCategory[]>([]);
@@ -76,6 +76,12 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    if (initialPurchaseId) {
+      void showDetail(initialPurchaseId);
+      onPurchaseOpened();
+    }
+  }, [initialPurchaseId, onPurchaseOpened]);
   const startCreate = () => {
     setEditing(null);
     const draft = sessionStorage.getItem("monolog.purchase-draft");

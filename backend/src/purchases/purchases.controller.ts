@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Res,
   UploadedFiles,
   UseInterceptors,
@@ -19,11 +20,12 @@ import { PurchaseImageParamDto } from './dto/purchase-image-param.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import type { UploadedPurchaseImage } from './image-upload';
 import { PurchasesService } from './purchases.service';
+import { SearchPurchasesDto } from './dto/search-purchases.dto';
 @Controller()
 export class PurchasesController {
   constructor(private readonly purchases: PurchasesService) {}
-  @Get('purchases') findAll() {
-    return this.purchases.findAll();
+  @Get('purchases') findAll(@Query() query: SearchPurchasesDto) {
+    return this.purchases.findAll(query);
   }
   @Get('purchases/:id') findOne(@Param() params: PurchaseIdParamDto) {
     return this.purchases.findOne(params.id);

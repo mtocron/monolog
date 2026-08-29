@@ -20,6 +20,7 @@ import { PurchaseCategory } from './purchase-category.entity';
 import { PurchaseImage } from './purchase-image.entity';
 import { Purchase } from './purchase.entity';
 import { EntryPurchase } from '../entries/entry-purchase.entity';
+import { SearchPurchasesDto } from './dto/search-purchases.dto';
 
 const purchaseRelations = {
   purchaseCategory: true,
@@ -43,16 +44,47 @@ export class PurchasesService {
     private readonly settingsService: SettingsService,
   ) {}
 
-  findAll(): Promise<Purchase[]> {
-    return this.purchases.find({
-      relations: purchaseRelations,
-      order: {
-        purchasedAt: 'DESC',
-        createdAt: 'DESC',
-        id: 'DESC',
-        images: { sortOrder: 'ASC' },
-      },
-    });
+  findAll(query: SearchPurchasesDto = {}): Promise<Purchase[]> {
+    const builder = this.purchases
+      .createQueryBuilder('purchase')
+      .leftJoinAndSelect('purchase.purchaseCategory', 'purchaseCategory')
+      .leftJoinAndSelect('purchase.images', 'image')
+      .leftJoinAndSelect('purchase.entryPurchases', 'entryPurchase')
+      .leftJoinAndSelect('entryPurchase.entry', 'entry');
+    if (query.name)
+      builder.andWhere('purchase.name ILIKE :name', {
+        name: `%${query.name}%`,
+      });
+    if (query.purchaseCategoryId)
+      builder.andWhere('purchase.purchase_category_id = :purchaseCategoryId', {
+        purchaseCategoryId: query.purchaseCategoryId,
+      });
+    if (query.purchasedFrom)
+      builder.andWhere('purchase.purchased_at >= :purchasedFrom', {
+        purchasedFrom: query.purchasedFrom,
+      });
+    if (query.purchasedTo)
+      builder.andWhere('purchase.purchased_at <= :purchasedTo', {
+        purchasedTo: query.purchasedTo,
+      });
+    if (query.shop)
+      builder.andWhere('purchase.shop ILIKE :shop', {
+        shop: `%${query.shop}%`,
+      });
+    if (query.minPrice !== undefined)
+      builder.andWhere('purchase.price >= :minPrice', {
+        minPrice: query.minPrice,
+      });
+    if (query.maxPrice !== undefined)
+      builder.andWhere('purchase.price <= :maxPrice', {
+        maxPrice: query.maxPrice,
+      });
+    return builder
+      .orderBy('purchase.purchased_at', 'DESC')
+      .addOrderBy('purchase.created_at', 'DESC')
+      .addOrderBy('purchase.id', 'DESC')
+      .addOrderBy('image.sort_order', 'ASC')
+      .getMany();
   }
   findAllCategories(): Promise<PurchaseCategory[]> {
     return this.categories.find({ order: { sortOrder: 'ASC', name: 'ASC' } });
