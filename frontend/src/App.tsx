@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState } from "react";
+import { createElement, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import {
   Angry,
@@ -8,12 +8,16 @@ import {
   CloudSun,
   CloudSunRain,
   Frown,
+  FileText,
   Laugh,
+  Plus,
   Settings,
+  ShoppingBag,
   Snowflake,
   Sparkles,
   Sun,
   TriangleAlert,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -84,6 +88,7 @@ const format = (value: string) =>
     timeStyle: "short",
   }).format(new Date(value));
 type Form = EntryInput & { tagIds: string[]; purchaseIds: string[]; files: File[] };
+type CreateKind = "entry" | "purchase";
 const emptyForm = (): Form => ({
   content: "",
   recordedAt: new Date().toISOString(),
@@ -106,6 +111,7 @@ function App() {
     "list" | "detail" | "form" | "settings" | "purchases" | "search"
   >("list");
   const [selectedPurchaseId, setSelectedPurchaseId] = useState<string | null>(null);
+  const [startPurchaseCreate, setStartPurchaseCreate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -170,6 +176,22 @@ function App() {
     setError("");
     setPage("form");
   };
+  const openCreate = (kind: CreateKind) => {
+    if (kind === "entry") {
+      create();
+      return;
+    }
+    setSelectedPurchaseId(null);
+    setStartPurchaseCreate(true);
+    setPage("purchases");
+  };
+  const timeline = [
+    ...entries.map((item) => ({ kind: "entry" as const, item, occurredAt: item.recordedAt })),
+    ...purchases.map((item) => ({ kind: "purchase" as const, item, occurredAt: item.purchasedAt })),
+  ].sort((left, right) => {
+    const byDate = new Date(right.occurredAt).getTime() - new Date(left.occurredAt).getTime();
+    return byDate || right.item.id.localeCompare(left.item.id);
+  });
   const changeTheme = async (nextTheme: Theme) => {
     const previousTheme = theme;
     setTheme(nextTheme);
@@ -320,6 +342,7 @@ function App() {
           </button>
         </div>
       </header>
+      <CreateMenu onSelect={openCreate} />
       {error && <Notice kind="error" onClose={() => setError("")}>{error}</Notice>}
       {success && <Notice kind="success" onClose={() => setSuccess("")}>{success}</Notice>}
       {page === "list" && (
@@ -335,14 +358,14 @@ function App() {
           </div>
           {loading ? (
             <LoadingState />
-          ) : entries.length ? (
+          ) : timeline.length ? (
             <div className="list">
-              {entries.map((item) => (
-                <Card
-                  key={item.id}
-                  entry={item}
-                  onClick={() => void detail(item.id)}
-                />
+              {timeline.map(({ kind, item }) => (
+                kind === "entry" ? (
+                  <Card key={`entry-${item.id}`} entry={item} onClick={() => void detail(item.id)} />
+                ) : (
+                  <TimelinePurchaseCard key={`purchase-${item.id}`} purchase={item} onClick={() => { setSelectedPurchaseId(item.id); setPage("purchases"); }} />
+                )
               ))}
             </div>
           ) : (
@@ -401,7 +424,7 @@ function App() {
         />
       )}
       {page === "search" && <SearchPage onEntry={(id) => void detail(id)} onPurchase={(id) => { setSelectedPurchaseId(id); setPage("purchases"); }} />}
-      {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} initialPurchaseId={selectedPurchaseId} onPurchaseOpened={() => setSelectedPurchaseId(null)} />}
+      {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} initialPurchaseId={selectedPurchaseId} onPurchaseOpened={() => setSelectedPurchaseId(null)} startCreating={startPurchaseCreate} onCreateStarted={() => setStartPurchaseCreate(false)} />}
       <ConfirmDialog
         open={deleteTarget !== null}
         title={deleteTarget === "entry" ? "記録を削除しますか？" : "画像を削除しますか？"}
@@ -580,6 +603,58 @@ function Tags({ entry }: { entry: Entry }) {
         <span key={relation.id}>#{relation.tag.name}</span>
       ))}
     </div>
+  );
+}
+function CreateMenu({ onSelect }: { onSelect: (kind: CreateKind) => void }) {
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const close = () => setOpen(false);
+  const select = (kind: CreateKind) => {
+    close();
+    onSelect(kind);
+  };
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) close();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, []);
+  return (
+    <div className="create-menu" ref={containerRef}>
+      {open && <button type="button" className="create-overlay" aria-label="作成メニューを閉じる" onClick={close} />}
+      <div className={`create-dropdown${open ? " open" : ""}`} role="menu" aria-label="作成メニュー">
+        <button type="button" role="menuitem" onClick={() => select("entry")}>
+          <FileText aria-hidden="true" />記録
+        </button>
+        <button type="button" role="menuitem" onClick={() => select("purchase")}>
+          <ShoppingBag aria-hidden="true" />購入記録
+        </button>
+      </div>
+      <button type="button" className="create-trigger primary" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        <span className="create-trigger-label"><Plus aria-hidden="true" /> 作成 <span aria-hidden="true">▼</span></span>
+        <span className="create-fab-icon" aria-hidden="true">{open ? <X /> : <Plus />}</span>
+        <span className="sr-only">{open ? "作成メニューを閉じる" : "作成メニューを開く"}</span>
+      </button>
+    </div>
+  );
+}
+function TimelinePurchaseCard({ purchase, onClick }: { purchase: Purchase; onClick: () => void }) {
+  return (
+    <article className="card timeline-purchase-card">
+      <button onClick={onClick}>
+        <time>{purchase.purchasedAt}</time>
+        <p>{purchase.name}</p>
+        <div className="meta"><span>{purchase.purchaseCategory.name}</span><span>¥{purchase.price.toLocaleString("ja-JP")}</span>{purchase.shop && <span>{purchase.shop}</span>}</div>
+      </button>
+    </article>
   );
 }
 function Card({ entry, onClick }: { entry: Entry; onClick: () => void }) {

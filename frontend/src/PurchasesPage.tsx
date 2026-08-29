@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import {
   api,
@@ -28,7 +28,7 @@ const yen = (price: number) =>
     maximumFractionDigits: 0,
   }).format(price);
 
-export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened }: { onBack: () => void; initialPurchaseId: string | null; onPurchaseOpened: () => void }) {
+export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened, startCreating, onCreateStarted }: { onBack: () => void; initialPurchaseId: string | null; onPurchaseOpened: () => void; startCreating: boolean; onCreateStarted: () => void }) {
   const [page, setPage] = useState<Page>("list");
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [categories, setCategories] = useState<PurchaseCategory[]>([]);
@@ -82,13 +82,18 @@ export function PurchasesPage({ onBack, initialPurchaseId, onPurchaseOpened }: {
       onPurchaseOpened();
     }
   }, [initialPurchaseId, onPurchaseOpened]);
-  const startCreate = () => {
+  const startCreate = useCallback(() => {
     setEditing(null);
     const draft = sessionStorage.getItem("monolog.purchase-draft");
     setForm(draft ? { ...emptyForm(categories[0]?.id), ...(JSON.parse(draft) as Partial<Form>) } : emptyForm(categories[0]?.id));
     setError("");
     setPage("form");
-  };
+  }, [categories]);
+  useEffect(() => {
+    if (!startCreating) return;
+    startCreate();
+    onCreateStarted();
+  }, [startCreating, onCreateStarted, startCreate]);
   const startEdit = () => {
     if (!purchase) return;
     setEditing(purchase);

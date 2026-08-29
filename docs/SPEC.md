@@ -2259,11 +2259,11 @@ Version 0.1完成時までにREADMEへ、
 
 ## 統合Timeline
 
-- [ ] EntryとPurchaseをトップページの同じTimelineへ混在表示
-- [ ] Entryは`recorded_at DESC`、Purchaseは`purchased_at DESC`で時系列順に表示
-- [ ] 同一日時では`created_at`、`id`等により順序を安定化
-- [ ] Entry CardとPurchase Cardから既存の各詳細画面へ遷移
-- [ ] 既存データを利用し、新規テーブル・Migrationは追加しない
+- [x] EntryとPurchaseをトップページの同じTimelineへ混在表示
+- [x] Entryは`recorded_at DESC`、Purchaseは`purchased_at DESC`で時系列順に表示
+- [x] 同一日時では`created_at`、`id`等により順序を安定化
+- [x] Entry CardとPurchase Cardから既存の各詳細画面へ遷移
+- [x] 既存データを利用し、新規テーブル・Migrationは追加しない
 
 ## 作成メニュー
 
@@ -2274,33 +2274,33 @@ Version 0.1完成時までにREADMEへ、
 
 ### PC
 
-- [ ] 「＋ 作成 ▼」ボタンを表示
-- [ ] ボタン直下に、レイアウトを押し下げないDropdownを表示
-- [ ] 「記録」「購入記録」をこの順で表示し、各行全体をクリック可能にする
-- [ ] ボタン再クリック、メニュー外クリック、Escapeキー、項目選択で適切に閉じる
-- [ ] `aria-expanded`、`aria-haspopup`等を設定し、キーボード操作とフォーカス表示に対応
+- [x] 「＋ 作成 ▼」ボタンを表示
+- [x] ボタン直下に、レイアウトを押し下げないDropdownを表示
+- [x] 「記録」「購入記録」をこの順で表示し、各行全体をクリック可能にする
+- [x] ボタン再クリック、メニュー外クリック、Escapeキー、項目選択で適切に閉じる
+- [x] `aria-expanded`、`aria-haspopup`等を設定し、キーボード操作とフォーカス表示に対応
 
 ### Smartphone
 
-- [ ] 768px未満ではPC用の作成ボタンを表示しない（既存の共通breakpointがあればそれを優先）
-- [ ] 画面右下に、safe-areaを考慮した固定FABを表示
-- [ ] FABタップで「記録」「購入記録」のSpeed Dialを上方向へ展開
-- [ ] FABに近い順を「記録」「購入記録」とし、展開時は「＋」を「×」へ変更
-- [ ] 展開中は画面全体へオーバーレイを表示し、背景の誤操作を防止
-- [ ] FAB、オーバーレイ、Escapeキー、項目選択で適切に閉じる
-- [ ] `prefers-reduced-motion`を尊重した軽い開閉アニメーションを付ける
-- [ ] FABと各Speed Dial項目は十分なタップ領域を持つbutton要素とする
+- [x] 768px未満ではPC用の作成ボタンを表示しない（既存の共通breakpointがあればそれを優先）
+- [x] 画面右下に、safe-areaを考慮した固定FABを表示
+- [x] FABタップで「記録」「購入記録」のSpeed Dialを上方向へ展開
+- [x] FABに近い順を「記録」「購入記録」とし、展開時は「＋」を「×」へ変更
+- [x] 展開中は画面全体へオーバーレイを表示し、背景の誤操作を防止
+- [x] FAB、オーバーレイ、Escapeキー、項目選択で適切に閉じる
+- [x] `prefers-reduced-motion`を尊重した軽い開閉アニメーションを付ける
+- [x] FABと各Speed Dial項目は十分なタップ領域を持つbutton要素とする
 
 ### 共通
 
-- [ ] PCとSmartphoneでは表示方法だけを変え、メニュー定義と画面遷移処理を共通化
-- [ ] 「記録」は既存の記録新規作成画面へ遷移
-- [ ] 「購入記録」は既存の購入記録新規作成画面へ遷移
-- [ ] 新しい作成画面・フォーム・モーダル・登録API・ルーティング方式は追加しない
-- [ ] 実装前に既存のroute、router、breakpoint、テーマトークン、アイコンライブラリを調査して再利用
-- [ ] light / dark / captureテーマに追従し、固定色ではなく既存のSemantic Tokenを優先
-- [ ] PCのサイドバー、ヘッダー、メインコンテンツ、スクロール、およびSmartphoneレイアウトを壊さない
-- [ ] PC / Smartphoneの表示・操作・遷移、およびlint / build / test（用意されている場合）を確認
+- [x] PCとSmartphoneでは表示方法だけを変え、メニュー定義と画面遷移処理を共通化
+- [x] 「記録」は既存の記録新規作成画面へ遷移
+- [x] 「購入記録」は既存の購入記録新規作成画面へ遷移
+- [x] 新しい作成画面・フォーム・モーダル・登録API・ルーティング方式は追加しない
+- [x] 実装前に既存のroute、router、breakpoint、テーマトークン、アイコンライブラリを調査して再利用
+- [x] light / dark / captureテーマに追従し、固定色ではなく既存のSemantic Tokenを優先
+- [x] PCのサイドバー、ヘッダー、メインコンテンツ、スクロール、およびSmartphoneレイアウトを壊さない
+- [x] PC / Smartphoneの表示・操作・遷移、およびlint / build / test（用意されている場合）を確認
 
 詳細なUI要件は`docs/create-menu-responsive-ui-prompt.md`に従う。
 
