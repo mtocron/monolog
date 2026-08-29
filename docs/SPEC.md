@@ -1644,15 +1644,20 @@ capture
 
 トップページ。
 
-Entryを、
+EntryとPurchaseを同じTimelineに時系列で混在表示する。
+
+表示順は以下とする。
 
 ```text
-recorded_at DESC
+Entry    : recorded_at DESC
+Purchase : purchased_at DESC
 ```
 
 で表示する。
 
-同一日時の場合は、
+Purchaseは購入日（`purchased_at`）をTimeline上の日時として扱う。
+
+異なる種別を含めて同一日時の場合は、
 
 ```text
 created_at
@@ -1660,6 +1665,10 @@ id
 ```
 
 等で安定した順序を設定する。
+
+Entryは既存のEntry Card、Purchaseは購入内容が分かるPurchase Cardとして表示し、各カードから既存の詳細画面へ遷移できること。
+
+この統合表示のために新しいテーブル、ログテーブル、またはMigrationを追加しない。
 
 ---
 
@@ -2246,7 +2255,58 @@ Version 0.1完成時までにREADMEへ、
 
 ---
 
-# 95. Phase 13 — Docker / Raspberry Pi
+# 95. Phase 13 — 統合Timeline / 作成メニューUI
+
+## 統合Timeline
+
+- [ ] EntryとPurchaseをトップページの同じTimelineへ混在表示
+- [ ] Entryは`recorded_at DESC`、Purchaseは`purchased_at DESC`で時系列順に表示
+- [ ] 同一日時では`created_at`、`id`等により順序を安定化
+- [ ] Entry CardとPurchase Cardから既存の各詳細画面へ遷移
+- [ ] 既存データを利用し、新規テーブル・Migrationは追加しない
+
+## 作成メニュー
+
+作成できる種類は以下の2種類とする。
+
+- 記録
+- 購入記録
+
+### PC
+
+- [ ] 「＋ 作成 ▼」ボタンを表示
+- [ ] ボタン直下に、レイアウトを押し下げないDropdownを表示
+- [ ] 「記録」「購入記録」をこの順で表示し、各行全体をクリック可能にする
+- [ ] ボタン再クリック、メニュー外クリック、Escapeキー、項目選択で適切に閉じる
+- [ ] `aria-expanded`、`aria-haspopup`等を設定し、キーボード操作とフォーカス表示に対応
+
+### Smartphone
+
+- [ ] 768px未満ではPC用の作成ボタンを表示しない（既存の共通breakpointがあればそれを優先）
+- [ ] 画面右下に、safe-areaを考慮した固定FABを表示
+- [ ] FABタップで「記録」「購入記録」のSpeed Dialを上方向へ展開
+- [ ] FABに近い順を「記録」「購入記録」とし、展開時は「＋」を「×」へ変更
+- [ ] 展開中は画面全体へオーバーレイを表示し、背景の誤操作を防止
+- [ ] FAB、オーバーレイ、Escapeキー、項目選択で適切に閉じる
+- [ ] `prefers-reduced-motion`を尊重した軽い開閉アニメーションを付ける
+- [ ] FABと各Speed Dial項目は十分なタップ領域を持つbutton要素とする
+
+### 共通
+
+- [ ] PCとSmartphoneでは表示方法だけを変え、メニュー定義と画面遷移処理を共通化
+- [ ] 「記録」は既存の記録新規作成画面へ遷移
+- [ ] 「購入記録」は既存の購入記録新規作成画面へ遷移
+- [ ] 新しい作成画面・フォーム・モーダル・登録API・ルーティング方式は追加しない
+- [ ] 実装前に既存のroute、router、breakpoint、テーマトークン、アイコンライブラリを調査して再利用
+- [ ] light / dark / captureテーマに追従し、固定色ではなく既存のSemantic Tokenを優先
+- [ ] PCのサイドバー、ヘッダー、メインコンテンツ、スクロール、およびSmartphoneレイアウトを壊さない
+- [ ] PC / Smartphoneの表示・操作・遷移、およびlint / build / test（用意されている場合）を確認
+
+詳細なUI要件は`docs/create-menu-responsive-ui-prompt.md`に従う。
+
+---
+
+# 96. Phase 14 — Docker / Raspberry Pi
 
 - [ ] Frontend Dockerfile
 - [ ] Backend Dockerfile
@@ -2265,7 +2325,7 @@ Version 0.1完成時までにREADMEへ、
 
 ---
 
-# 96. Phase 14 — Backup / Restore
+# 97. Phase 15 — Backup / Restore
 
 - [ ] PostgreSQL Backup
 - [ ] PostgreSQL Restore
