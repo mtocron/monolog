@@ -10,6 +10,8 @@
   --color-muted: #f0f1ee;
   --color-error-bg: #fff0ef;
   --color-error: #a12f28;
+  --color-success-bg: #e7f3e8;
+  --color-success: #245b32;
   --color-danger: #a12f28;
   --color-focus: #8bb9a0;
   font-family:
@@ -32,6 +34,8 @@
   --color-muted: #343834;
   --color-error-bg: #482926;
   --color-error: #ffaca4;
+  --color-success-bg: #203d29;
+  --color-success: #b7e5bf;
   --color-danger: #ffaaa2;
   --color-focus: #9cc9ad;
 }
@@ -47,6 +51,8 @@
   --color-muted: #fbdd74;
   --color-error-bg: #fbdd74;
   --color-error: #1f1235;
+  --color-success-bg: #fbdd74;
+  --color-success: #1f1235;
   --color-danger: #1f1235;
   --color-focus: #67568c;
   --color-illustration-stroke: #1f1235;

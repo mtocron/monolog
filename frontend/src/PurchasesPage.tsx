@@ -6,6 +6,7 @@ import {
   type PurchaseCategory,
   type PurchaseInput,
 } from "./api";
+import { ConfirmDialog, EmptyState, ImageFilePreview, LoadingState, Notice } from "./Ux";
 
 type Page = "list" | "detail" | "form";
 type Form = PurchaseInput & { files: File[] };
@@ -37,6 +38,8 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<"purchase" | string | null>(null);
   const categoryName = useMemo(
     () => new Map(categories.map((category) => [category.id, category.name])),
     [categories],
@@ -75,7 +78,8 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
   };
   const startCreate = () => {
     setEditing(null);
-    setForm(emptyForm(categories[0]?.id));
+    const draft = sessionStorage.getItem("monolog.purchase-draft");
+    setForm(draft ? { ...emptyForm(categories[0]?.id), ...(JSON.parse(draft) as Partial<Form>) } : emptyForm(categories[0]?.id));
     setError("");
     setPage("form");
   };
@@ -106,6 +110,8 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
         await api.purchases.uploadImages(saved.id, form.files);
       await reload();
       await showDetail(saved.id);
+      sessionStorage.removeItem("monolog.purchase-draft");
+      setSuccess(editing ? "購入記録を更新しました。" : "購入記録を保存しました。");
     } catch (reason) {
       fail(reason);
     } finally {
@@ -113,22 +119,24 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
     }
   };
   const remove = async () => {
-    if (!purchase || !confirm("この購入記録を削除しますか？")) return;
+    if (!purchase) return;
     try {
       await api.purchases.remove(purchase.id);
       setPurchase(null);
       setPage("list");
       await reload();
+      setSuccess("購入記録を削除しました。");
     } catch (reason) {
       fail(reason);
     }
   };
   const removeImage = async (imageId: string) => {
-    if (!purchase || !confirm("この画像を削除しますか？")) return;
+    if (!purchase) return;
     try {
       await api.purchases.removeImage(purchase.id, imageId);
       await showDetail(purchase.id);
       await reload();
+      setSuccess("画像を削除しました。");
     } catch (reason) {
       fail(reason);
     }
@@ -147,15 +155,11 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
           </button>
         )}
       </div>
-      {error && (
-        <div className="error" role="alert">
-          {error}
-          <button onClick={() => setError("")}>×</button>
-        </div>
-      )}
+      {error && <Notice kind="error" onClose={() => setError("")}>{error}</Notice>}
+      {success && <Notice kind="success" onClose={() => setSuccess("")}>{success}</Notice>}
       {page === "list" &&
         (loading ? (
-          <p className="state">読み込み中…</p>
+          <LoadingState />
         ) : purchases.length ? (
           <div className="purchase-list">
             {purchases.map((item) => (
@@ -188,7 +192,7 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
             ))}
           </div>
         ) : (
-          <p className="state">購入記録はまだありません。</p>
+          <EmptyState>購入記録はまだありません。</EmptyState>
         ))}
       {page === "detail" && purchase && (
         <>
@@ -196,7 +200,7 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
             <button onClick={() => setPage("list")}>一覧へ</button>
             <span>
               <button onClick={startEdit}>編集</button>
-              <button className="danger" onClick={() => void remove()}>
+              <button className="danger" onClick={() => setDeleteTarget("purchase")}>
                 削除
               </button>
             </span>
@@ -236,7 +240,7 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
                     />
                     <button
                       className="danger"
-                      onClick={() => void removeImage(image.id)}
+                      onClick={() => setDeleteTarget(image.id)}
                     >
                       画像を削除
                     </button>
@@ -261,6 +265,18 @@ export function PurchasesPage({ onBack }: { onBack: () => void }) {
       <p className="right">
         <button onClick={onBack}>記録一覧へ戻る</button>
       </p>
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={deleteTarget === "purchase" ? "購入記録を削除しますか？" : "画像を削除しますか？"}
+        description="この操作は元に戻せません。"
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          const target = deleteTarget;
+          setDeleteTarget(null);
+          if (target === "purchase") void remove();
+          else if (target) void removeImage(target);
+        }}
+      />
     </section>
   );
 }
@@ -284,6 +300,12 @@ function PurchaseForm({
 }) {
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm({ ...form, [key]: value });
+  useEffect(() => {
+    if (!editing && form.name.trim()) {
+      const { files: _files, ...draft } = form;
+      sessionStorage.setItem("monolog.purchase-draft", JSON.stringify(draft));
+    }
+  }, [editing, form]);
   return (
     <form onSubmit={save} className="purchase-form">
       <label>
@@ -363,9 +385,7 @@ function PurchaseForm({
             set("files", Array.from(event.target.files ?? []))
           }
         />
-        {form.files.length > 0 && (
-          <small>{form.files.map((file) => file.name).join("、")}</small>
-        )}
+        <ImageFilePreview files={form.files} />
       </label>
       <div className="actions">
         <button type="button" onClick={cancel}>

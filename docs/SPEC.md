@@ -2208,15 +2208,15 @@ Version 0.1完成時までにREADMEへ、
 
 # 93. Phase 11 — UX改善
 
-- [ ] Entryフォーム簡略化
-- [ ] Optional項目折りたたみ
-- [ ] Loading統一
-- [ ] Error統一
-- [ ] Success通知
-- [ ] Delete Dialog
-- [ ] Empty State
-- [ ] 画像表示改善
-- [ ] 入力データ誤消失対策
+- [x] Entryフォーム簡略化
+- [x] Optional項目折りたたみ
+- [x] Loading統一
+- [x] Error統一
+- [x] Success通知
+- [x] Delete Dialog
+- [x] Empty State
+- [x] 画像表示改善
+- [x] 入力データ誤消失対策
 - [ ] Smartphone UX
 - [ ] Light UX
 - [ ] Dark UX

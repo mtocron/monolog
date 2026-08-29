@@ -27,6 +27,7 @@ import {
   type Weather,
 } from "./api";
 import { PurchasesPage } from "./PurchasesPage";
+import { ConfirmDialog, EmptyState, ImageFilePreview, LoadingState, Notice } from "./Ux";
 import "./App.css";
 
 type IconChoice<T extends string> = {
@@ -106,6 +107,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<"entry" | string | null>(null);
   const [tagName, setTagName] = useState("");
   const [theme, setTheme] = useState<Theme>("light");
   const [imageRootPath, setImageRootPath] = useState("");
@@ -160,7 +163,8 @@ function App() {
   };
   const create = () => {
     setEditing(null);
-    setForm(emptyForm());
+    const draft = sessionStorage.getItem("monolog.entry-draft");
+    setForm(draft ? { ...emptyForm(), ...(JSON.parse(draft) as Partial<Form>) } : emptyForm());
     setError("");
     setPage("form");
   };
@@ -246,6 +250,8 @@ function App() {
         await api.entries.uploadImages(saved.id, form.files);
       setEntry(await api.entries.get(saved.id));
       await reload();
+      sessionStorage.removeItem("monolog.entry-draft");
+      setSuccess(editing ? "記録を更新しました。" : "記録を保存しました。");
       setPage("detail");
     } catch (reason) {
       fail(reason);
@@ -268,22 +274,24 @@ function App() {
     }
   };
   const remove = async () => {
-    if (!entry || !confirm("この記録を削除します。元に戻せません。")) return;
+    if (!entry) return;
     try {
       await api.entries.remove(entry.id);
       setPage("list");
       setEntry(null);
       await reload();
+      setSuccess("記録を削除しました。");
     } catch (reason) {
       fail(reason);
     }
   };
   const removeImage = async (id: string) => {
-    if (!entry || !confirm("この画像を削除しますか？")) return;
+    if (!entry) return;
     try {
       await api.entries.removeImage(entry.id, id);
       setEntry(await api.entries.get(entry.id));
       await reload();
+      setSuccess("画像を削除しました。");
     } catch (reason) {
       fail(reason);
     }
@@ -309,12 +317,8 @@ function App() {
           </button>
         </div>
       </header>
-      {error && (
-        <div className="error" role="alert">
-          {error}
-          <button onClick={() => setError("")}>×</button>
-        </div>
-      )}
+      {error && <Notice kind="error" onClose={() => setError("")}>{error}</Notice>}
+      {success && <Notice kind="success" onClose={() => setSuccess("")}>{success}</Notice>}
       {page === "list" && (
         <>
           <div className="heading">
@@ -327,7 +331,7 @@ function App() {
             </button>
           </div>
           {loading ? (
-            <p className="state">読み込み中…</p>
+            <LoadingState />
           ) : entries.length ? (
             <div className="list">
               {entries.map((item) => (
@@ -339,9 +343,9 @@ function App() {
               ))}
             </div>
           ) : (
-            <p className="state">
+            <EmptyState>
               まだ記録はありません。最初の一件を書いてみましょう。
-            </p>
+            </EmptyState>
           )}
         </>
       )}
@@ -351,14 +355,14 @@ function App() {
             <button onClick={() => setPage("list")}>← 一覧へ</button>
             <span>
               <button onClick={edit}>編集</button>
-              <button className="danger" onClick={() => void remove()}>
+              <button className="danger" onClick={() => setDeleteTarget("entry")}>
                 削除
               </button>
             </span>
           </div>
           <EntryView
             entry={entry}
-            onRemoveImage={(id) => void removeImage(id)}
+          onRemoveImage={(id) => setDeleteTarget(id)}
           />
           <p className="right">
             <button className="primary" onClick={edit}>
@@ -394,6 +398,18 @@ function App() {
         />
       )}
       {page === "purchases" && <PurchasesPage onBack={() => setPage("list")} />}
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={deleteTarget === "entry" ? "記録を削除しますか？" : "画像を削除しますか？"}
+        description={deleteTarget === "entry" ? "この操作は元に戻せません。" : "この画像は元に戻せません。"}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => {
+          const target = deleteTarget;
+          setDeleteTarget(null);
+          if (target === "entry") void remove();
+          else if (target) void removeImage(target);
+        }}
+      />
     </main>
   );
 }
@@ -671,6 +687,12 @@ function FormView({
 }) {
   const set = <K extends keyof Form>(key: K, value: Form[K]) =>
     setForm((current) => ({ ...current, [key]: value }));
+  useEffect(() => {
+    if (!editing && form.content.trim()) {
+      const { files: _files, ...draft } = form;
+      sessionStorage.setItem("monolog.entry-draft", JSON.stringify(draft));
+    }
+  }, [editing, form]);
   return (
     <section>
       <div className="heading">
@@ -691,6 +713,9 @@ function FormView({
             placeholder="今のこと、残したいことを書いてください"
           />
         </label>
+        <details className="optional-fields">
+          <summary>日時・場所・気分などを追加</summary>
+          <div className="optional-content">
         <div className="grid">
           <label>
             記録日時
@@ -780,6 +805,8 @@ function FormView({
           selectedIds={form.purchaseIds}
           onChange={(purchaseIds) => set("purchaseIds", purchaseIds)}
         />
+          </div>
+        </details>
         <label>
           画像（JPEG / PNG / WebP、最大10枚）
           <input
@@ -790,12 +817,13 @@ function FormView({
               set("files", Array.from(event.target.files ?? []))
             }
           />
-          {form.files.length > 0 && (
-            <small>{form.files.map((file) => file.name).join("、")}</small>
-          )}
+        <ImageFilePreview files={form.files} />
         </label>
         <div className="actions">
-          <button type="button" onClick={cancel}>
+          <button type="button" onClick={() => {
+            if (!editing && form.content.trim() && !confirm("入力内容は下書きとして保持されます。キャンセルしますか？")) return;
+            cancel();
+          }}>
             キャンセル
           </button>
           <button className="primary" disabled={saving}>
