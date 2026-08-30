@@ -234,9 +234,6 @@ form {
   border-radius: 0;
   background: transparent;
 }
-.card:first-child {
-  border-top: 1px solid var(--color-border);
-}
 .settings-panel {
   display: grid;
   gap: 18px;
