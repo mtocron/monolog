@@ -346,10 +346,6 @@ function App() {
       {page === "list" && (
         <>
           <div className="heading">
-            <div>
-              <small>Timeline</small>
-              <h1>記録</h1>
-            </div>
             <button className="primary" onClick={create}>
               ＋ 新しい記録
             </button>
